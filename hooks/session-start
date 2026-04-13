@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+
+# Derive project slug from project root path
+PROJECT_ROOT="${CLAUDE_PROJECT_ROOT:-${PWD}}"
+# Replace / with - to match ~/.claude/projects/ slug format
+SLUG="${PROJECT_ROOT//\//-}"
+CONFIG_FILE="${HOME}/.claude/projects/${SLUG}/sensei.config.json"
+
+escape_for_json() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  s="${s//$'\n'/\\n}"
+  s="${s//$'\r'/\\r}"
+  s="${s//$'\t'/\\t}"
+  printf '%s' "$s"
+}
+
+# ── Always-on rules ──────────────────────────────────────────────────────────
+# These inject into every session regardless of project config.
+
+CONTEXT="<package-manager-rule>
+Before running any shell command in a JavaScript or TypeScript project, determine the package manager by reading the root package.json:
+- \"packageManager\": \"bun@...\"  → use bun
+- \"packageManager\": \"pnpm@...\" → use pnpm
+- \"packageManager\": \"npm@...\"  → use npm
+- No field: check lock files — bun.lock/bun.lockb → bun, pnpm-lock.yaml → pnpm, package-lock.json → npm
+
+Rules (no exceptions):
+1. Never use npm, npx, bunx, or direct binary calls when a root script exists for the same purpose
+2. Always run root scripts: <pm> run <script>
+3. For workspace targeting: <pm> run <script> --filter=<package-name>
+4. Inner package scripts are a fallback only — use when no root script exists
+
+Common mistakes to avoid:
+- bunx vitest        → bun run test
+- bunx tsc           → bun run typecheck  (or check root package.json first)
+- npx eslint .       → bun run lint
+- cd packages/foo && bun run test  → bun run test  (root runs all)
+</package-manager-rule>"
+
+# ── Opt-in skills (project-specific) ────────────────────────────────────────
+
+if [ -f "$CONFIG_FILE" ]; then
+  SKILLS_JSON=$(cat "$CONFIG_FILE" 2>/dev/null || echo '{"skills":[]}')
+  SKILLS=$(echo "$SKILLS_JSON" | python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+skills = d.get('skills', [])
+print(', '.join(skills))
+" 2>/dev/null || echo "")
+
+  if [ -n "$SKILLS" ]; then
+    CONTEXT="${CONTEXT}
+
+<sensei-opt-in-skills>
+The following opt-in skills are active for this project: ${SKILLS}
+Use the Skill tool to invoke them when their trigger conditions are met.
+</sensei-opt-in-skills>"
+  fi
+fi
+
+ESCAPED=$(escape_for_json "$CONTEXT")
+
+cat <<EOF
+{
+  "additional_context": "${ESCAPED}",
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": "${ESCAPED}"
+  }
+}
+EOF
+exit 0
