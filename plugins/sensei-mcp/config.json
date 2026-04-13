@@ -1,0 +1,24 @@
+{
+  "name": "sensei-mcp",
+  "description": "Graph-powered code intelligence via sensei daemon",
+  "mcp_server": {
+    "command": "senseid",
+    "args": ["--mcp"],
+    "env": {}
+  },
+  "supported_acps": ["claude-code", "cursor", "windsurf", "kiro", "opencode", "zed"],
+  "acp_configs": {
+    "claude-code": {
+      "config_path": ".claude/plugins/sensei/plugin.json",
+      "format": "claude-plugin"
+    },
+    "cursor": {
+      "config_path": ".cursor/mcp.json",
+      "format": "mcp-json"
+    },
+    "windsurf": {
+      "config_path": ".windsurf/mcp.json",
+      "format": "mcp-json"
+    }
+  }
+}

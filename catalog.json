@@ -1,0 +1,308 @@
+{
+  "version": "0.1.0",
+  "items": [
+    {
+      "name": "zero-errors-policy",
+      "kind": "skill",
+      "description": "Zero lint/test errors at all times — before and after every change",
+      "scope": "global",
+      "recommended_for": ["all"],
+      "stage": ["active", "maintenance"],
+      "path": "skills/zero-errors-policy/SKILL.md"
+    },
+    {
+      "name": "session-management",
+      "kind": "skill",
+      "description": "Structured session protocol with context snapshots and checkpoints",
+      "scope": "global",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "skills/session-management/SKILL.md"
+    },
+    {
+      "name": "pattern-based-development",
+      "kind": "skill",
+      "description": "Check PATTERNS.md before implementing — follow established recipes",
+      "scope": "global",
+      "recommended_for": ["all"],
+      "stage": ["active", "maintenance"],
+      "path": "skills/pattern-based-development/SKILL.md"
+    },
+    {
+      "name": "detecting-doc-drift",
+      "kind": "skill",
+      "description": "Flag design docs that have drifted from the code",
+      "scope": "project",
+      "recommended_for": ["api", "backend", "library"],
+      "stage": ["active", "maintenance"],
+      "path": "skills/detecting-doc-drift/SKILL.md"
+    },
+    {
+      "name": "identifying-patterns",
+      "kind": "skill",
+      "description": "Discover and document recurring structural patterns",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "skills/identifying-patterns/SKILL.md"
+    },
+    {
+      "name": "decomposing-broad-tasks",
+      "kind": "skill",
+      "description": "Break large requests into focused subtasks before starting",
+      "scope": "project",
+      "recommended_for": ["api", "backend"],
+      "stage": ["active"],
+      "path": "skills/decomposing-broad-tasks/SKILL.md"
+    },
+    {
+      "name": "context-efficiency",
+      "kind": "skill",
+      "description": "Trim and refocus context when switching tasks",
+      "scope": "global",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "skills/context-efficiency/SKILL.md"
+    },
+    {
+      "name": "working-smarter",
+      "kind": "skill",
+      "description": "Protocols for running long autonomous sessions safely",
+      "scope": "global",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "skills/working-smarter/SKILL.md"
+    },
+    {
+      "name": "codebase-indexing",
+      "kind": "skill",
+      "description": "Index an unfamiliar codebase for efficient navigation",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["init"],
+      "path": "skills/codebase-indexing/SKILL.md"
+    },
+    {
+      "name": "design",
+      "kind": "skill",
+      "description": "Design-first approach for new features — wireframes, data models, API contracts",
+      "scope": "project",
+      "recommended_for": ["api", "frontend", "mobile"],
+      "stage": ["init", "active"],
+      "path": "skills/design/SKILL.md"
+    },
+    {
+      "name": "reverse-engineering",
+      "kind": "skill",
+      "description": "Reverse-engineer existing codebases into documentation and specs",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["init"],
+      "path": "skills/reverse-engineering/SKILL.md"
+    },
+    {
+      "name": "test-gen",
+      "kind": "skill",
+      "description": "Generate comprehensive test suites from existing code",
+      "scope": "project",
+      "recommended_for": ["api", "backend", "library"],
+      "stage": ["active", "maintenance"],
+      "path": "skills/test-gen/SKILL.md"
+    },
+    {
+      "name": "refactor",
+      "kind": "skill",
+      "description": "Safe refactoring with test coverage and incremental changes",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["maintenance"],
+      "path": "skills/refactor/SKILL.md"
+    },
+    {
+      "name": "extract-docs",
+      "kind": "skill",
+      "description": "Extract documentation from code into structured markdown",
+      "scope": "project",
+      "recommended_for": ["library", "api"],
+      "stage": ["active", "maintenance"],
+      "path": "skills/extract-docs/SKILL.md"
+    },
+    {
+      "name": "building-app-mockups",
+      "kind": "skill",
+      "description": "Build interactive mockups and prototypes",
+      "scope": "project",
+      "recommended_for": ["frontend", "mobile"],
+      "stage": ["init"],
+      "path": "skills/building-app-mockups/SKILL.md"
+    },
+    {
+      "name": "identify-unknown-libs",
+      "kind": "skill",
+      "description": "Detect and document unknown libraries in the codebase",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["init"],
+      "path": "skills/identify-unknown-libs/SKILL.md"
+    },
+    {
+      "name": "analyze",
+      "kind": "skill",
+      "description": "Deep analysis of codebase architecture and dependencies",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["init", "active"],
+      "path": "skills/analyze/SKILL.md"
+    },
+    {
+      "name": "guiding-doc-creation",
+      "kind": "skill",
+      "description": "Guide creation of project documentation (README, ADR, API docs)",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["init", "active"],
+      "path": "skills/guiding-doc-creation/SKILL.md"
+    },
+    {
+      "name": "reformatting-docs",
+      "kind": "skill",
+      "description": "Reformat and restructure existing documentation",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["maintenance"],
+      "path": "skills/reformatting-docs/SKILL.md"
+    },
+    {
+      "name": "sensei-mcp",
+      "kind": "plugin",
+      "description": "Graph-powered code intelligence — search symbols, trace calls, query architecture",
+      "scope": "global",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "mcp_config": {
+        "command": "senseid",
+        "args": ["--mcp"]
+      },
+      "path": "plugins/sensei-mcp/config.json"
+    },
+    {
+      "name": "playwright-mcp",
+      "kind": "plugin",
+      "description": "Browser automation — navigate, click, screenshot, evaluate JS",
+      "scope": "project",
+      "recommended_for": ["frontend", "ui", "e2e"],
+      "stage": ["active"],
+      "mcp_config": {
+        "command": "npx",
+        "args": ["@anthropic/mcp-playwright"]
+      },
+      "path": "plugins/playwright-mcp/config.json"
+    },
+    {
+      "name": "firebase-mcp",
+      "kind": "plugin",
+      "description": "Firebase project management — apps, rules, environment config",
+      "scope": "project",
+      "recommended_for": ["api", "backend", "mobile"],
+      "stage": ["active"],
+      "mcp_config": {
+        "command": "npx",
+        "args": ["@anthropic/mcp-firebase"]
+      },
+      "path": "plugins/firebase-mcp/config.json"
+    },
+    {
+      "name": "commit",
+      "kind": "command",
+      "description": "Create structured git commits with conventional format",
+      "scope": "global",
+      "recommended_for": ["all"],
+      "stage": ["active", "maintenance"],
+      "path": "commands/commit.md"
+    },
+    {
+      "name": "checkpoint",
+      "kind": "command",
+      "description": "Record session checkpoint with progress summary",
+      "scope": "global",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/checkpoint.md"
+    },
+    {
+      "name": "session",
+      "kind": "command",
+      "description": "Manage coding sessions — start, stop, status",
+      "scope": "global",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/session.md"
+    },
+    {
+      "name": "backlog",
+      "kind": "command",
+      "description": "Manage project backlog items",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/backlog.md"
+    },
+    {
+      "name": "feature",
+      "kind": "command",
+      "description": "Plan and implement a new feature end-to-end",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/feature.md"
+    },
+    {
+      "name": "audit",
+      "kind": "command",
+      "description": "Audit codebase for quality, security, and best practices",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["maintenance"],
+      "path": "commands/audit.md"
+    },
+    {
+      "name": "mockup",
+      "kind": "command",
+      "description": "Generate interactive UI mockups",
+      "scope": "project",
+      "recommended_for": ["frontend", "mobile"],
+      "stage": ["init"],
+      "path": "commands/mockup.md"
+    },
+    {
+      "name": "session-start",
+      "kind": "hook",
+      "description": "Inject skills and project context on session startup",
+      "scope": "global",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "event": "SessionStart",
+      "path": "hooks/session-start"
+    },
+    {
+      "name": "pre-tool",
+      "kind": "hook",
+      "description": "Capture tool inputs before execution for analytics",
+      "scope": "global",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "event": "PreToolExecution",
+      "path": "hooks/pre-tool"
+    },
+    {
+      "name": "post-tool",
+      "kind": "hook",
+      "description": "Record tool outputs and exit codes after execution",
+      "scope": "global",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "event": "PostToolExecution",
+      "path": "hooks/post-tool"
+    }
+  ]
+}

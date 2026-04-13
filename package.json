@@ -1,0 +1,21 @@
+{
+  "name": "@sensei/marketplace",
+  "version": "0.1.0",
+  "description": "Skills, plugins, commands, and hooks for sensei AI coding companion",
+  "type": "module",
+  "exports": {
+    "./catalog": "./catalog.json",
+    "./skills/*": "./skills/*/SKILL.md",
+    "./commands/*": "./commands/*.md",
+    "./hooks/*": "./hooks/*"
+  },
+  "files": [
+    "catalog.json",
+    "skills/",
+    "commands/",
+    "hooks/",
+    "plugins/"
+  ],
+  "keywords": ["sensei", "ai", "coding", "skills", "mcp", "claude"],
+  "license": "MIT"
+}
