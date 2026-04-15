@@ -212,6 +212,15 @@
       "path": "plugins/firebase-mcp/config.json"
     },
     {
+      "name": "get-api-docs",
+      "kind": "command",
+      "description": "Fetch documentation for a third-party library, SDK, or API before writing code that uses it",
+      "scope": "global",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/get-api-docs.md"
+    },
+    {
       "name": "commit",
       "kind": "command",
       "description": "Create structured git commits with conventional format",
