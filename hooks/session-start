@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
-
-# Derive project slug from project root path
+DAEMON_URL="http://127.0.0.1:7744"
 PROJECT_ROOT="${CLAUDE_PROJECT_ROOT:-${PWD}}"
-# Replace / with - to match ~/.claude/projects/ slug format
-SLUG="${PROJECT_ROOT//\//-}"
-CONFIG_FILE="${HOME}/.claude/projects/${SLUG}/sensei.config.json"
+PROJECT_NAME="$(basename "$PROJECT_ROOT")"
 
 escape_for_json() {
   local s="$1"
@@ -19,10 +15,50 @@ escape_for_json() {
   printf '%s' "$s"
 }
 
-# ── Always-on rules ──────────────────────────────────────────────────────────
-# These inject into every session regardless of project config.
+# ── Create session on daemon ─────────────────────────────────────────────────
+SESSION_ID=$(uuidgen 2>/dev/null || python3 -c "import uuid; print(uuid.uuid4())" 2>/dev/null || echo "")
+if [ -n "$SESSION_ID" ]; then
+  curl -s -X POST "${DAEMON_URL}/api/sessions" \
+    -H "Content-Type: application/json" \
+    -d "{\"id\":\"${SESSION_ID}\",\"repoId\":\"${PROJECT_NAME}\",\"task\":\"session\"}" \
+    --connect-timeout 2 --max-time 3 >/dev/null 2>&1 &
+fi
 
-CONTEXT="<package-manager-rule>
+# ── Context injection ────────────────────────────────────────────────────────
+
+CONTEXT="<sensei-session>
+Session ID: ${SESSION_ID}
+Project: ${PROJECT_NAME}
+Path: ${PROJECT_ROOT}
+
+## Sensei MCP Tools Available
+
+Use these tools instead of web searches when possible:
+
+**Code Intelligence:**
+- \`search(query, project?)\` — Find functions and types. Defaults to current project. Use \`project=\"rokkit\"\` to search other repos.
+- \`get_callers(name)\` — Who calls this function?
+- \`get_callees(name)\` — What does this function call?
+- \`get_patterns(pattern)\` — Find files by pattern: hook, middleware, route, component
+- \`get_communities()\` — Code architecture clusters
+- \`get_project_summary()\` — Stats, libs, stack for current project
+
+**Library Documentation:**
+- \`get_lib_docs(name)\` — Get library index/overview (e.g. rokkit, dbd, kavach, bits-ui)
+- \`get_lib_docs(name, component)\` — Get specific component docs (e.g. name=\"rokkit\", component=\"list\")
+- \`search_lib_docs(query)\` — Search across all indexed library docs
+- \`add_library(name)\` — Index a new library's docs (auto-discovers llms.txt from common URLs)
+
+**Session Tracking:**
+- \`update_session(sessionId=\"${SESSION_ID}\", outcome=\"completed\", summary=\"...\")\` — Call when task is done
+
+## Guidelines
+- Check indexed lib docs before searching the web
+- Use \`add_library\` to index docs for any library not yet available
+- Call \`update_session\` with outcome when you finish the task
+</sensei-session>
+
+<package-manager-rule>
 Before running any shell command in a JavaScript or TypeScript project, determine the package manager by reading the root package.json:
 - \"packageManager\": \"bun@...\"  → use bun
 - \"packageManager\": \"pnpm@...\" → use pnpm
@@ -34,34 +70,7 @@ Rules (no exceptions):
 2. Always run root scripts: <pm> run <script>
 3. For workspace targeting: <pm> run <script> --filter=<package-name>
 4. Inner package scripts are a fallback only — use when no root script exists
-
-Common mistakes to avoid:
-- bunx vitest        → bun run test
-- bunx tsc           → bun run typecheck  (or check root package.json first)
-- npx eslint .       → bun run lint
-- cd packages/foo && bun run test  → bun run test  (root runs all)
 </package-manager-rule>"
-
-# ── Opt-in skills (project-specific) ────────────────────────────────────────
-
-if [ -f "$CONFIG_FILE" ]; then
-  SKILLS_JSON=$(cat "$CONFIG_FILE" 2>/dev/null || echo '{"skills":[]}')
-  SKILLS=$(echo "$SKILLS_JSON" | python3 -c "
-import json, sys
-d = json.load(sys.stdin)
-skills = d.get('skills', [])
-print(', '.join(skills))
-" 2>/dev/null || echo "")
-
-  if [ -n "$SKILLS" ]; then
-    CONTEXT="${CONTEXT}
-
-<sensei-opt-in-skills>
-The following opt-in skills are active for this project: ${SKILLS}
-Use the Skill tool to invoke them when their trigger conditions are met.
-</sensei-opt-in-skills>"
-  fi
-fi
 
 ESCAPED=$(escape_for_json "$CONTEXT")
 
