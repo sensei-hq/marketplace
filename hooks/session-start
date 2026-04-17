@@ -4,6 +4,7 @@ set -euo pipefail
 DAEMON_URL="http://127.0.0.1:7744"
 PROJECT_ROOT="${CLAUDE_PROJECT_ROOT:-${PWD}}"
 PROJECT_NAME="$(basename "$PROJECT_ROOT")"
+PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 
 escape_for_json() {
   local s="$1"
@@ -24,38 +25,77 @@ if [ -n "$SESSION_ID" ]; then
     --connect-timeout 2 --max-time 3 >/dev/null 2>&1 &
 fi
 
-# ── Context injection ────────────────────────────────────────────────────────
+# ── Read rules ──────────────────────────────────────────────────────────
+RULES_FILE="${PROJECT_ROOT}/.sensei/rules.md"
+RULES_SECTION=""
+if [ -f "$RULES_FILE" ]; then
+  RULES_SECTION="## Project Guardrails (from .sensei/rules.md)
+
+$(cat "$RULES_FILE" | sed '/^---$/,/^---$/d' | head -80)
+
+Run /sensei:rules to view, add, or reload rules."
+else
+  RULES_SECTION="## Project Guardrails
+No rules file found. Run /sensei:rules to create one."
+fi
+
+# ── Read mindsets ────────────────────────────────────────────────────────────
+MINDSETS_FILE="${PLUGIN_ROOT}/templates/mindsets.md"
+MINDSETS_SECTION=""
+if [ -f "$MINDSETS_FILE" ]; then
+  MINDSETS_SECTION="## Mindsets
+Apply three mindsets in sequence: Analyst (understand the problem) → Developer (understand the implementation) → BAT (verify from user perspective). See /sensei:rules for full details."
+fi
+
+# ── Read workflow state ──────────────────────────────────────────────────────
+STATE_FILE="${PROJECT_ROOT}/.sensei/state.yaml"
+STATE_SECTION=""
+if [ -f "$STATE_FILE" ]; then
+  STATE_SECTION="## Workflow State
+$(cat "$STATE_FILE")
+Run /sensei:status for full orientation. Run /sensei:refocus to re-anchor."
+fi
+
+# ── Build context ────────────────────────────────────────────────────────────
 
 CONTEXT="<sensei-session>
 Session ID: ${SESSION_ID}
 Project: ${PROJECT_NAME}
 Path: ${PROJECT_ROOT}
 
-## Sensei MCP Tools Available
+${STATE_SECTION}
 
-Use these tools instead of web searches when possible:
+${RULES_SECTION}
+
+${MINDSETS_SECTION}
+
+## Sensei MCP Tools
+
+Prefer these over grep/sed/file reading:
 
 **Code Intelligence:**
-- \`search(query, project?)\` — Find functions and types. Defaults to current project. Use \`project=\"rokkit\"\` to search other repos.
+- \`search(query, project?)\` — Find functions and types
 - \`get_callers(name)\` — Who calls this function?
 - \`get_callees(name)\` — What does this function call?
 - \`get_patterns(pattern)\` — Find files by pattern: hook, middleware, route, component
 - \`get_communities()\` — Code architecture clusters
-- \`get_project_summary()\` — Stats, libs, stack for current project
+- \`get_project_summary()\` — Stats, libs, stack
 
 **Library Documentation:**
-- \`get_lib_docs(name)\` — Get library index/overview (e.g. rokkit, dbd, kavach, bits-ui)
-- \`get_lib_docs(name, component)\` — Get specific component docs (e.g. name=\"rokkit\", component=\"list\")
+- \`get_lib_docs(name)\` — Library overview (e.g. rokkit, kavach)
+- \`get_lib_docs(name, component)\` — Specific component docs
 - \`search_lib_docs(query)\` — Search across all indexed library docs
-- \`add_library(name)\` — Index a new library's docs (auto-discovers llms.txt from common URLs)
+- \`add_library(name)\` — Index a new library's docs
 
-**Session Tracking:**
+**Session:**
 - \`update_session(sessionId=\"${SESSION_ID}\", outcome=\"completed\", summary=\"...\")\` — Call when task is done
 
-## Guidelines
-- Check indexed lib docs before searching the web
-- Use \`add_library\` to index docs for any library not yet available
-- Call \`update_session\` with outcome when you finish the task
+## Workflow Commands
+
+**Phase:** /sensei:idea, /sensei:analyze, /sensei:blueprint, /sensei:experiment, /sensei:plan, /sensei:build, /sensei:validate
+**Cross-cutting:** /sensei:brainstorm, /sensei:review
+**Refocus:** /sensei:rules, /sensei:refocus, /sensei:status, /sensei:tools, /sensei:patterns
+**Utility:** /sensei:session, /sensei:checkpoint, /sensei:commit, /sensei:mockup, /sensei:pattern-extract, /sensei:get-api-docs, /sensei:help
 </sensei-session>
 
 <package-manager-rule>
