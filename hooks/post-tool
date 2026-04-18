@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Post-tool execution hook — logs tool results to sensei daemon
-# Runs after each tool call in Claude Code
+# Post-tool execution hook — logs tool result event to sensei daemon
+set -euo pipefail
 
 DAEMON_URL="http://127.0.0.1:7744"
 PROJECT_ROOT="${CLAUDE_PROJECT_ROOT:-${PWD}}"
@@ -9,12 +9,17 @@ TOOL_NAME="${CLAUDE_TOOL_NAME:-unknown}"
 EXIT_CODE="${CLAUDE_TOOL_EXIT_CODE:-0}"
 SESSION_ID="${CLAUDE_SESSION_ID:-}"
 
-# Log completion to daemon (fire-and-forget)
-curl -s -X PUT "${DAEMON_URL}/api/config" \
+# Detect if MCP tool
+IS_MCP=false
+if echo "$TOOL_NAME" | grep -q "^mcp__sensei"; then
+  IS_MCP=true
+fi
+
+# Log event to daemon (fire-and-forget)
+curl -s -X POST "${DAEMON_URL}/api/events" \
   -H "Content-Type: application/json" \
-  -d "{\"last_tool_result\":\"${TOOL_NAME}:${EXIT_CODE}\",\"last_tool_result_time\":\"$(date -u +%Y-%m-%dT%H:%M:%S+00:00)\"}" \
+  -d "{\"project\":\"${PROJECT_NAME}\",\"session_id\":\"${SESSION_ID}\",\"event_type\":\"tool_result\",\"data\":{\"tool\":\"${TOOL_NAME}\",\"exit_code\":${EXIT_CODE},\"is_mcp\":${IS_MCP}}}" \
   --connect-timeout 1 --max-time 2 >/dev/null 2>&1 &
 
-# Return empty — no context injection needed for post-tool
 echo '{}'
 exit 0
