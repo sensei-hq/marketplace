@@ -94,6 +94,72 @@ run_test "loads state when present" "pre-compact" \
   "import sys,json; d=json.load(sys.stdin); assert 'active_phase: ideate' in d['additional_context']" \
   "echo 'active_phase: ideate' > $TEMP_PROJECT/.sensei/state.yaml"
 
+echo ""
+echo "=== user-prompt hook ==="
+
+# Reset
+rm -f "$TEMP_PROJECT/.sensei/rules.md" "$TEMP_PROJECT/.sensei/state.yaml"
+
+run_test "returns valid JSON" "user-prompt" \
+  "import sys,json; d=json.load(sys.stdin); assert isinstance(d, dict)"
+
+# Classification logic tested below in dedicated section
+
+# Test classification function directly
+echo ""
+echo "=== Prompt classification ==="
+
+classify() {
+  local prompt="$1"
+  local expected="$2"
+  local result="new_request"
+  if echo "$prompt" | grep -qiE "(^no[,. ]|wrong|not what|try again|fix (this|that|it)|redo|that's (incorrect|not)|go back|revert|that is wrong)"; then
+    result="correction"
+  elif echo "$prompt" | grep -qiE "^(now |next |also |and then|continue )"; then
+    result="continuation"
+  elif echo "$prompt" | grep -qiE "(what about|how does|can you explain|why did|what is)"; then
+    result="clarification"
+  fi
+  if [ "$result" = "$expected" ]; then
+    echo "  PASS classify '$prompt' → $result"
+    PASS=$((PASS + 1))
+  else
+    echo "  FAIL classify '$prompt' → $result (expected $expected)"
+    FAIL=$((FAIL + 1))
+  fi
+}
+
+classify "no, that's wrong" "correction"
+classify "No, use the adapter pattern" "correction"
+classify "wrong approach, try again" "correction"
+classify "fix this please" "correction"
+classify "that is wrong" "correction"
+classify "go back to the previous approach" "correction"
+classify "now implement the tests" "continuation"
+classify "next step please" "continuation"
+classify "also add error handling" "continuation"
+classify "continue with the build" "continuation"
+classify "what about edge cases?" "clarification"
+classify "how does the adapter work?" "clarification"
+classify "can you explain the pattern?" "clarification"
+classify "add a new endpoint for users" "new_request"
+classify "implement the SQL adapter" "new_request"
+classify "build the dashboard view" "new_request"
+
+echo ""
+echo "=== pre-tool hook ==="
+
+run_test "returns valid JSON" "pre-tool" \
+  "import sys,json; d=json.load(sys.stdin); assert isinstance(d, dict)" \
+  "export CLAUDE_TOOL_NAME=Read"
+
+echo ""
+echo "=== post-tool hook ==="
+
+run_test "returns valid JSON" "post-tool" \
+  "import sys,json; d=json.load(sys.stdin); assert isinstance(d, dict)" \
+  "export CLAUDE_TOOL_NAME=Read; export CLAUDE_TOOL_EXIT_CODE=0"
+
 # Cleanup
 rm -rf "$TEMP_PROJECT"
 

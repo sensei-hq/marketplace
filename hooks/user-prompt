@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DAEMON_URL="http://127.0.0.1:7744"
+PROJECT_ROOT="${CLAUDE_PROJECT_ROOT:-${PWD}}"
+PROJECT_NAME="$(basename "$PROJECT_ROOT")"
+
+# ── Read active task from state ──────────────────────────────────────────────
+STATE_FILE="${PROJECT_ROOT}/.sensei/state.yaml"
+ACTIVE_TASK=""
+ACTIVE_ISSUE=""
+ACTIVE_PHASE=""
+if [ -f "$STATE_FILE" ]; then
+  ACTIVE_TASK=$(grep "^active_task:" "$STATE_FILE" 2>/dev/null | sed 's/^active_task: *//' | sed 's/^~//')
+  ACTIVE_ISSUE=$(grep "^active_issue:" "$STATE_FILE" 2>/dev/null | sed 's/^active_issue: *//' | sed 's/^~//')
+  ACTIVE_PHASE=$(grep "^active_phase:" "$STATE_FILE" 2>/dev/null | sed 's/^active_phase: *//' | sed 's/^~//')
+fi
+
+# ── Classify prompt ──────────────────────────────────────────────────────────
+# Read prompt from stdin (Claude Code passes it via hook input)
+PROMPT="${CLAUDE_USER_PROMPT:-}"
+
+CLASSIFICATION="new_request"
+if echo "$PROMPT" | grep -qiE "(^no[,. ]|wrong|not what|try again|fix (this|that|it)|redo|that's (incorrect|not)|go back|revert|that is wrong)"; then
+  CLASSIFICATION="correction"
+elif echo "$PROMPT" | grep -qiE "^(now |next |also |and then|continue )"; then
+  CLASSIFICATION="continuation"
+elif echo "$PROMPT" | grep -qiE "(what about|how does|can you explain|why did|what is)"; then
+  CLASSIFICATION="clarification"
+fi
+
+# ── Log turn event ───────────────────────────────────────────────────────────
+curl -s -X POST "${DAEMON_URL}/api/events" \
+  -H "Content-Type: application/json" \
+  -d "{\"project\":\"${PROJECT_NAME}\",\"event_type\":\"turn\",\"data\":{\"classification\":\"${CLASSIFICATION}\",\"active_task\":\"${ACTIVE_TASK}\",\"active_issue\":\"${ACTIVE_ISSUE}\",\"active_phase\":\"${ACTIVE_PHASE}\"}}" \
+  --connect-timeout 2 --max-time 3 >/dev/null 2>&1 &
+
+# ── Fire revision_requested on correction ────────────────────────────────────
+if [ "$CLASSIFICATION" = "correction" ]; then
+  curl -s -X POST "${DAEMON_URL}/api/events" \
+    -H "Content-Type: application/json" \
+    -d "{\"project\":\"${PROJECT_NAME}\",\"event_type\":\"revision_requested\",\"data\":{\"active_task\":\"${ACTIVE_TASK}\",\"active_issue\":\"${ACTIVE_ISSUE}\"}}" \
+    --connect-timeout 2 --max-time 3 >/dev/null 2>&1 &
+fi
+
+# Return empty — this hook doesn't inject context
+echo '{}'
+exit 0
