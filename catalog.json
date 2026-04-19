@@ -2,78 +2,6 @@
   "version": "0.1.0",
   "items": [
     {
-      "name": "zero-errors-policy",
-      "kind": "skill",
-      "description": "Zero lint/test errors at all times — before and after every change",
-      "scope": "global",
-      "recommended_for": ["all"],
-      "stage": ["active", "maintenance"],
-      "path": "skills/zero-errors-policy/SKILL.md"
-    },
-    {
-      "name": "session-management",
-      "kind": "skill",
-      "description": "Structured session protocol with context snapshots and checkpoints",
-      "scope": "global",
-      "recommended_for": ["all"],
-      "stage": ["active"],
-      "path": "skills/session-management/SKILL.md"
-    },
-    {
-      "name": "pattern-based-development",
-      "kind": "skill",
-      "description": "Check PATTERNS.md before implementing — follow established recipes",
-      "scope": "global",
-      "recommended_for": ["all"],
-      "stage": ["active", "maintenance"],
-      "path": "skills/pattern-based-development/SKILL.md"
-    },
-    {
-      "name": "detecting-doc-drift",
-      "kind": "skill",
-      "description": "Flag design docs that have drifted from the code",
-      "scope": "project",
-      "recommended_for": ["api", "backend", "library"],
-      "stage": ["active", "maintenance"],
-      "path": "skills/detecting-doc-drift/SKILL.md"
-    },
-    {
-      "name": "identifying-patterns",
-      "kind": "skill",
-      "description": "Discover and document recurring structural patterns",
-      "scope": "project",
-      "recommended_for": ["all"],
-      "stage": ["active"],
-      "path": "skills/identifying-patterns/SKILL.md"
-    },
-    {
-      "name": "decomposing-broad-tasks",
-      "kind": "skill",
-      "description": "Break large requests into focused subtasks before starting",
-      "scope": "project",
-      "recommended_for": ["api", "backend"],
-      "stage": ["active"],
-      "path": "skills/decomposing-broad-tasks/SKILL.md"
-    },
-    {
-      "name": "context-efficiency",
-      "kind": "skill",
-      "description": "Trim and refocus context when switching tasks",
-      "scope": "global",
-      "recommended_for": ["all"],
-      "stage": ["active"],
-      "path": "skills/context-efficiency/SKILL.md"
-    },
-    {
-      "name": "working-smarter",
-      "kind": "skill",
-      "description": "Protocols for running long autonomous sessions safely",
-      "scope": "global",
-      "recommended_for": ["all"],
-      "stage": ["active"],
-      "path": "skills/working-smarter/SKILL.md"
-    },
-    {
       "name": "codebase-indexing",
       "kind": "skill",
       "description": "Index an unfamiliar codebase for efficient navigation",
@@ -81,15 +9,6 @@
       "recommended_for": ["all"],
       "stage": ["init"],
       "path": "skills/codebase-indexing/SKILL.md"
-    },
-    {
-      "name": "design",
-      "kind": "skill",
-      "description": "Design-first approach for new features — wireframes, data models, API contracts",
-      "scope": "project",
-      "recommended_for": ["api", "frontend", "mobile"],
-      "stage": ["init", "active"],
-      "path": "skills/design/SKILL.md"
     },
     {
       "name": "reverse-engineering",
@@ -153,24 +72,6 @@
       "recommended_for": ["all"],
       "stage": ["init", "active"],
       "path": "skills/analyze/SKILL.md"
-    },
-    {
-      "name": "guiding-doc-creation",
-      "kind": "skill",
-      "description": "Guide creation of project documentation (README, ADR, API docs)",
-      "scope": "project",
-      "recommended_for": ["all"],
-      "stage": ["init", "active"],
-      "path": "skills/guiding-doc-creation/SKILL.md"
-    },
-    {
-      "name": "reformatting-docs",
-      "kind": "skill",
-      "description": "Reformat and restructure existing documentation",
-      "scope": "project",
-      "recommended_for": ["all"],
-      "stage": ["maintenance"],
-      "path": "skills/reformatting-docs/SKILL.md"
     },
     {
       "name": "sensei-mcp",
@@ -266,6 +167,15 @@
       "path": "commands/feature.md"
     },
     {
+      "name": "persona",
+      "kind": "command",
+      "description": "List, add, or switch project personas — role-play users to validate design decisions",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/persona.md"
+    },
+    {
       "name": "audit",
       "kind": "command",
       "description": "Audit codebase for quality, security, and best practices",
@@ -286,7 +196,7 @@
     {
       "name": "session-start",
       "kind": "hook",
-      "description": "Inject skills and project context on session startup",
+      "description": "Inject mindsets, rules, personas, and project context on session startup",
       "scope": "global",
       "recommended_for": ["all"],
       "stage": ["active"],
