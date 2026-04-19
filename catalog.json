@@ -65,6 +65,15 @@
       "path": "skills/identify-unknown-libs/SKILL.md"
     },
     {
+      "name": "ui-dummy-data",
+      "kind": "skill",
+      "description": "Build UI pages with typed dummy data first, wire real data later — framework-agnostic",
+      "scope": "project",
+      "recommended_for": ["frontend", "mobile"],
+      "stage": ["init", "active"],
+      "path": "skills/ui-dummy-data/SKILL.md"
+    },
+    {
       "name": "analyze",
       "kind": "skill",
       "description": "Deep analysis of codebase architecture and dependencies",
