@@ -113,6 +113,186 @@
       "path": "plugins/firebase-mcp/config.json"
     },
     {
+      "name": "idea",
+      "kind": "command",
+      "description": "Explore a concept — ask clarifying questions, document the problem space. No code.",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/idea.md"
+    },
+    {
+      "name": "analyze",
+      "kind": "command",
+      "description": "Assess feasibility against existing code — produce options with tradeoffs. No code.",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/analyze.md"
+    },
+    {
+      "name": "blueprint",
+      "kind": "command",
+      "description": "Design the architecture — components, interfaces, data flow. No code.",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/blueprint.md"
+    },
+    {
+      "name": "experiment",
+      "kind": "command",
+      "description": "Try an approach — build a minimal prototype, document findings. Code is discardable.",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/experiment.md"
+    },
+    {
+      "name": "plan",
+      "kind": "command",
+      "description": "Decompose a blueprint into features with acceptance criteria. Creates GitHub issues.",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/plan.md"
+    },
+    {
+      "name": "build",
+      "kind": "command",
+      "description": "Implement a feature — locate code, decompose into testable functions, TDD, review",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/build.md"
+    },
+    {
+      "name": "validate",
+      "kind": "command",
+      "description": "Verify implementation — tests pass, acceptance criteria met, no doc drift",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/validate.md"
+    },
+    {
+      "name": "brainstorm",
+      "kind": "command",
+      "description": "Open creative conversation — explore ideas, routes content to the right folder by depth",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/brainstorm.md"
+    },
+    {
+      "name": "review",
+      "kind": "command",
+      "description": "Quality check — pattern conformance, duplicates, test coverage, doc drift",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/review.md"
+    },
+    {
+      "name": "persona",
+      "kind": "command",
+      "description": "List, add, or switch project personas — role-play users to validate design decisions",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/persona.md"
+    },
+    {
+      "name": "rules",
+      "kind": "command",
+      "description": "View, create, or add project rules — enforceable patterns, quality, and process constraints",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/rules.md"
+    },
+    {
+      "name": "patterns",
+      "kind": "command",
+      "description": "Show detected patterns, project conventions, and match patterns for a task",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/patterns.md"
+    },
+    {
+      "name": "pattern-extract",
+      "kind": "command",
+      "description": "Extract a reusable pattern from existing code and write it to PATTERNS.md",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/pattern-extract.md"
+    },
+    {
+      "name": "pattern-use",
+      "kind": "command",
+      "description": "Look up a pattern by name and apply it to the current task",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/pattern-use.md"
+    },
+    {
+      "name": "refocus",
+      "kind": "command",
+      "description": "Re-anchor on current task after drift or compaction — reload state, plan, rules",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/refocus.md"
+    },
+    {
+      "name": "status",
+      "kind": "command",
+      "description": "Show current workflow state — phase, task, issue, rules, patterns, docs, tools",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/status.md"
+    },
+    {
+      "name": "product",
+      "kind": "command",
+      "description": "Reverse-engineer the full product — generates openspec/product/ docs",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/product.md"
+    },
+    {
+      "name": "feature",
+      "kind": "command",
+      "description": "Plan and implement a new feature end-to-end",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/feature.md"
+    },
+    {
+      "name": "audit",
+      "kind": "command",
+      "description": "Audit codebase for quality, security, and best practices",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["maintenance"],
+      "path": "commands/audit.md"
+    },
+    {
+      "name": "backlog",
+      "kind": "command",
+      "description": "Manage project backlog items",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/backlog.md"
+    },
+    {
       "name": "get-api-docs",
       "kind": "command",
       "description": "Fetch documentation for a third-party library, SDK, or API before writing code that uses it",
@@ -149,42 +329,6 @@
       "path": "commands/session.md"
     },
     {
-      "name": "backlog",
-      "kind": "command",
-      "description": "Manage project backlog items",
-      "scope": "project",
-      "recommended_for": ["all"],
-      "stage": ["active"],
-      "path": "commands/backlog.md"
-    },
-    {
-      "name": "feature",
-      "kind": "command",
-      "description": "Plan and implement a new feature end-to-end",
-      "scope": "project",
-      "recommended_for": ["all"],
-      "stage": ["active"],
-      "path": "commands/feature.md"
-    },
-    {
-      "name": "persona",
-      "kind": "command",
-      "description": "List, add, or switch project personas — role-play users to validate design decisions",
-      "scope": "project",
-      "recommended_for": ["all"],
-      "stage": ["active"],
-      "path": "commands/persona.md"
-    },
-    {
-      "name": "audit",
-      "kind": "command",
-      "description": "Audit codebase for quality, security, and best practices",
-      "scope": "project",
-      "recommended_for": ["all"],
-      "stage": ["maintenance"],
-      "path": "commands/audit.md"
-    },
-    {
       "name": "mockup",
       "kind": "command",
       "description": "Generate interactive UI mockups",
@@ -192,6 +336,33 @@
       "recommended_for": ["frontend", "mobile"],
       "stage": ["init"],
       "path": "commands/mockup.md"
+    },
+    {
+      "name": "enable",
+      "kind": "command",
+      "description": "Enable an opt-in skill for this project",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/enable.md"
+    },
+    {
+      "name": "disable",
+      "kind": "command",
+      "description": "Disable an opt-in skill for this project",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/disable.md"
+    },
+    {
+      "name": "help",
+      "kind": "command",
+      "description": "Show all available sensei commands and skills",
+      "scope": "global",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/help.md"
     },
     {
       "name": "session-start",
