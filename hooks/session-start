@@ -39,12 +39,52 @@ else
 No rules file found. Run /sensei:rules to create one."
 fi
 
-# ── Read mindsets ────────────────────────────────────────────────────────────
-MINDSETS_FILE="${PLUGIN_ROOT}/templates/mindsets.md"
+# ── Read mindsets (from .sensei/mindsets/ folder) ────────────────────────────
+MINDSETS_DIR="${PROJECT_ROOT}/.sensei/mindsets"
 MINDSETS_SECTION=""
-if [ -f "$MINDSETS_FILE" ]; then
+if [ -d "$MINDSETS_DIR" ] && ls "$MINDSETS_DIR"/*.md >/dev/null 2>&1; then
   MINDSETS_SECTION="## Mindsets
-Apply three mindsets in sequence: Analyst (understand the problem) → Developer (understand the implementation) → BAT (verify from user perspective). See /sensei:rules for full details."
+
+Apply core three in sequence: Analyst -> Developer -> BAT. Apply specialists when domain applies.
+"
+  for mfile in "$MINDSETS_DIR"/*.md; do
+    MNAME=$(sed -n 's/^name: *//p' "$mfile" | head -1)
+    MWHEN=$(sed -n 's/^when: *//p' "$mfile" | head -1)
+    # Extract questions (lines starting with number + dot + bold)
+    MQUESTIONS=$(sed -n '/^## Questions/,/^## /{/^[0-9]/p}' "$mfile" | head -7)
+    MINDSETS_SECTION="${MINDSETS_SECTION}
+### ${MNAME}
+*${MWHEN}*
+${MQUESTIONS}
+"
+  done
+else
+  # Fall back to single file in plugin templates
+  MINDSETS_FILE="${PLUGIN_ROOT}/templates/mindsets.md"
+  if [ -f "$MINDSETS_FILE" ]; then
+    MINDSETS_SECTION="$(sed '/^---$/,/^---$/d' "$MINDSETS_FILE" | head -120)"
+  fi
+fi
+
+# ── Read personas ────────────────────────────────────────────────────────────
+PERSONAS_DIR="${PROJECT_ROOT}/.sensei/personas"
+PERSONAS_SECTION=""
+if [ -d "$PERSONAS_DIR" ] && ls "$PERSONAS_DIR"/*.md >/dev/null 2>&1; then
+  PERSONA_SUMMARIES=""
+  for pfile in "$PERSONAS_DIR"/*.md; do
+    # Extract frontmatter fields: name, description, validates
+    PNAME=$(sed -n 's/^name: *//p' "$pfile" | head -1)
+    PDESC=$(sed -n 's/^description: *//p' "$pfile" | head -1)
+    PVALIDATES=$(sed -n '/^validates:/,/^---/{/^  - /s/^  - //p}' "$pfile" | head -5 | sed 's/^/    - /')
+    PERSONA_SUMMARIES="${PERSONA_SUMMARIES}
+- **${PNAME}** — ${PDESC}
+  Validates:
+${PVALIDATES}"
+  done
+  PERSONAS_SECTION="## Project Personas (from .sensei/personas/)
+${PERSONA_SUMMARIES}
+
+When validating work, consider each persona's goals and validates criteria."
 fi
 
 # ── Read workflow state ──────────────────────────────────────────────────────
@@ -68,6 +108,8 @@ ${STATE_SECTION}
 ${RULES_SECTION}
 
 ${MINDSETS_SECTION}
+
+${PERSONAS_SECTION}
 
 ## Sensei MCP Tools
 
@@ -93,7 +135,7 @@ Prefer these over grep/sed/file reading:
 ## Workflow Commands
 
 **Phase:** /sensei:idea, /sensei:analyze, /sensei:blueprint, /sensei:experiment, /sensei:plan, /sensei:build, /sensei:validate
-**Cross-cutting:** /sensei:brainstorm, /sensei:review
+**Cross-cutting:** /sensei:brainstorm, /sensei:review, /sensei:persona
 **Refocus:** /sensei:rules, /sensei:refocus, /sensei:status, /sensei:tools, /sensei:patterns
 **Utility:** /sensei:session, /sensei:checkpoint, /sensei:commit, /sensei:mockup, /sensei:pattern-extract, /sensei:get-api-docs, /sensei:help
 </sensei-session>

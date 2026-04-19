@@ -66,6 +66,14 @@ flowchart LR
 |---|------|------|-----------|
 | 1 | [item] | [type] | [deps] |
 
+## Personas
+
+<!-- If .sensei/personas.yaml defines personas, consider each one here. -->
+
+| Persona | Key goal | Acceptance from their perspective |
+|---------|----------|----------------------------------|
+| [persona] | [what they want] | [how they know it works] |
+
 ## What this blueprint does NOT cover
 
 <!-- Explicit scope boundaries. What's out of scope and where it's tracked instead. -->

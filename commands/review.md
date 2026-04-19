@@ -45,12 +45,20 @@ Checks code quality across multiple dimensions. Auto-triggered after `/sensei:bu
 1. Check if modified code files are referenced in any docs
 2. If a doc references a modified file, flag it for review
 
+### Check 6: Persona validation
+
+1. Read `.sensei/personas.yaml` — if it exists and has personas defined:
+2. For each persona (or just the active one if set):
+   - Evaluate modified code/features against the persona's `validates` criteria
+   - Flag any criterion that isn't met
+3. If no personas file exists, skip this check
+
 ### Report
 
 Present findings grouped by severity:
 - Violations (pattern not followed, missing tests)
 - Warnings (duplication, convention deviations)
-- Info (doc drift suggestions)
+- Info (doc drift suggestions, persona validation notes)
 
 ## Important
 

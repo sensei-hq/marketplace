@@ -1,11 +1,11 @@
 ---
 name: Mindsets
-description: Three mindsets for quality AI-assisted development — analyst, developer, business acceptance tester
+description: Seven mindsets for quality AI-assisted development — analyst, developer, BAT + UX, security, performance, DevOps
 ---
 
 # Mindsets
 
-Apply these in sequence: Analyst → Developer → BAT. Each catches what the previous doesn't.
+Apply the **core three** in sequence on every task: Analyst → Developer → BAT. Apply the **specialist four** when the task touches their domain.
 
 ## Analyst mindset
 
@@ -43,3 +43,49 @@ After implementation, verify from the user's perspective — not just "does the 
 5. **Test the correction path** — User says "that's wrong." Does the system learn? Is the correction captured? Will it be different next time?
 6. **Verify against acceptance criteria** — Go back to the issue. Read each criterion. Is it met? Not "probably" — demonstrate it.
 7. **Check for regressions** — Did this change break something that was working? Run the full suite, not just the new tests.
+
+---
+
+# Specialist Mindsets
+
+Apply these when the task touches their domain. They supplement the core three, not replace them.
+
+## UX Designer mindset
+
+When the task involves user-facing interfaces, commands, or output:
+
+1. **Is the flow intuitive?** — Can a new user accomplish the task without reading docs? If not, the design needs work.
+2. **Is the language clear?** — No jargon, no ambiguous labels. Would a non-technical stakeholder understand the output?
+3. **Is it consistent?** — Same patterns for same actions. If one command uses `--verbose`, all similar commands should too.
+4. **Is it accessible?** — Does it degrade gracefully in constrained environments (small terminal, no color, screen reader)?
+5. **Does the journey end?** — Every action should have a clear outcome. No dead ends, no "now what?" moments.
+
+## Security Reviewer mindset
+
+When the task involves user input, authentication, data storage, or external communication:
+
+1. **What can go wrong?** — Assume malicious input on every boundary. SQL injection? Path traversal? Command injection? XSS?
+2. **What data is exposed?** — Logs, error messages, API responses — do any leak secrets, tokens, internal paths, or PII?
+3. **Is auth enforced?** — Every endpoint, every file access, every state mutation. Not just "logged in" but "authorized for this action."
+4. **Are secrets handled correctly?** — Never in code, never in logs, never in git. Environment variables or secret managers only.
+5. **What's the blast radius?** — If this component is compromised, what else falls? Minimize privilege. Isolate failure domains.
+
+## Performance Engineer mindset
+
+When the task involves data processing, queries, loops, or user-facing latency:
+
+1. **What's the complexity?** — O(n) vs O(n²) matters at scale. If you're iterating a list inside a loop, justify it.
+2. **What's the memory footprint?** — Streaming vs buffering. Do you need all items in memory or can you process one at a time?
+3. **What's the network cost?** — Every HTTP call, every DB query is latency. Batch where possible. Cache where stable.
+4. **Can it handle 10x?** — If there are 10 files today and 10,000 tomorrow, does the design still hold? If not, document the limit.
+5. **Where's the bottleneck?** — Profile before optimizing. Measure, don't guess.
+
+## DevOps/SRE mindset
+
+When the task involves deployment, infrastructure, monitoring, or reliability:
+
+1. **Can this be deployed safely?** — Is there a migration? A feature flag? A rollback plan? What happens if deployment fails halfway?
+2. **Can this be monitored?** — Are there health checks? Metrics? Alerts? If it breaks at 3am, how does oncall know?
+3. **Can this be rolled back?** — Database migrations, config changes, feature flags — can you undo each independently?
+4. **What's the failure mode?** — Service down? Degraded? Data loss? Design for the failure you can tolerate.
+5. **Is the config external?** — No hardcoded URLs, ports, or thresholds. Environment variables or config files that can change without a rebuild.
