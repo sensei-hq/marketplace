@@ -25,7 +25,7 @@ fi
 MINDSETS_FILE="${PLUGIN_ROOT}/templates/mindsets.md"
 MINDSETS_SUMMARY=""
 if [ -f "$MINDSETS_FILE" ]; then
-  MINDSETS_SUMMARY="Mindsets loaded: analyst, developer, BAT (see /sensei:rules for details)"
+  MINDSETS_SUMMARY="Mindsets loaded: analyst, developer, acceptance tester (see /sensei:rules for details)"
 fi
 
 # ── Read workflow state ──────────────────────────────────────────────────────

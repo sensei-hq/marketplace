@@ -1,11 +1,11 @@
 ---
 name: Mindsets
-description: Seven mindsets for quality AI-assisted development — analyst, developer, BAT + UX, security, performance, DevOps
+description: Seven mindsets for quality AI-assisted development — analyst, developer, acceptance tester + UX, security, performance, DevOps
 ---
 
 # Mindsets
 
-Apply the **core three** in sequence on every task: Analyst → Developer → BAT. Apply the **specialist four** when the task touches their domain.
+Apply the **core three** in sequence on every task: Analyst → Developer → Acceptance Tester. Apply the **specialist four** when the task touches their domain.
 
 ## Analyst mindset
 

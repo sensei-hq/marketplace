@@ -25,6 +25,14 @@ if [ -n "$SESSION_ID" ]; then
     --connect-timeout 2 --max-time 3 >/dev/null 2>&1 &
 fi
 
+# ── Check daemon health ─────────────────────────────────────────────────
+DAEMON_STATUS="unknown"
+if curl -s --connect-timeout 1 --max-time 2 "${DAEMON_URL}/health" >/dev/null 2>&1; then
+  DAEMON_STATUS="running"
+else
+  DAEMON_STATUS="NOT RUNNING — MCP tools will be unavailable. Run: sensei start"
+fi
+
 # ── Read rules ──────────────────────────────────────────────────────────
 RULES_FILE="${PROJECT_ROOT}/.sensei/rules.md"
 RULES_SECTION=""
@@ -45,7 +53,7 @@ MINDSETS_SECTION=""
 if [ -d "$MINDSETS_DIR" ] && ls "$MINDSETS_DIR"/*.md >/dev/null 2>&1; then
   MINDSETS_SECTION="## Mindsets
 
-Apply core three in sequence: Analyst -> Developer -> BAT. Apply specialists when domain applies.
+Apply core three in sequence: Analyst -> Developer -> Acceptance Tester. Apply specialists when domain applies.
 "
   for mfile in "$MINDSETS_DIR"/*.md; do
     MNAME=$(sed -n 's/^name: *//p' "$mfile" | head -1)
@@ -102,6 +110,7 @@ CONTEXT="<sensei-session>
 Session ID: ${SESSION_ID}
 Project: ${PROJECT_NAME}
 Path: ${PROJECT_ROOT}
+Daemon: ${DAEMON_STATUS}
 
 ${STATE_SECTION}
 
@@ -111,15 +120,19 @@ ${MINDSETS_SECTION}
 
 ${PERSONAS_SECTION}
 
-## Sensei MCP Tools
+## Sensei MCP Tools (REQUIRED)
 
-Prefer these over grep/sed/file reading:
+You MUST use sensei MCP tools instead of grep/glob for code navigation. These tools use the indexed code graph and return richer results. If MCP tools fail, fall back to grep/glob and report the failure.
 
-**Code Intelligence:**
-- \`search(query, project?)\` — Find functions and types
-- \`get_callers(name)\` — Who calls this function?
+**Before implementing any change**, call:
+- \`get_patterns(pattern)\` — check existing patterns FIRST. Do not implement without checking.
+- \`get_project_summary()\` — understand the codebase structure
+
+**Code Intelligence (use instead of grep/glob):**
+- \`search(query, project?)\` — Find functions and types (replaces grep for symbol search)
+- \`get_callers(name)\` — Who calls this function? (replaces manual tracing)
 - \`get_callees(name)\` — What does this function call?
-- \`get_patterns(pattern)\` — Find files by pattern: hook, middleware, route, component
+- \`get_patterns(pattern)\` — Find architectural patterns: hook, middleware, route, component, adapter
 - \`get_communities()\` — Code architecture clusters
 - \`get_project_summary()\` — Stats, libs, stack
 
@@ -129,7 +142,7 @@ Prefer these over grep/sed/file reading:
 - \`search_lib_docs(query)\` — Search across all indexed library docs
 - \`add_library(name)\` — Index a new library's docs
 
-**Session:**
+**Session (call when done):**
 - \`update_session(sessionId=\"${SESSION_ID}\", outcome=\"completed\", summary=\"...\")\` — Call when task is done
 
 ## Workflow Commands
