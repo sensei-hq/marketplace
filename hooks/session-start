@@ -51,7 +51,7 @@ Apply core three in sequence: Analyst -> Developer -> BAT. Apply specialists whe
     MNAME=$(sed -n 's/^name: *//p' "$mfile" | head -1)
     MWHEN=$(sed -n 's/^when: *//p' "$mfile" | head -1)
     # Extract questions (lines starting with number + dot + bold)
-    MQUESTIONS=$(sed -n '/^## Questions/,/^## /{/^[0-9]/p}' "$mfile" | head -7)
+    MQUESTIONS=$(awk '/^## Questions/{found=1;next} /^## /{found=0} found && /^[0-9]/' "$mfile" | head -7)
     MINDSETS_SECTION="${MINDSETS_SECTION}
 ### ${MNAME}
 *${MWHEN}*
@@ -75,7 +75,7 @@ if [ -d "$PERSONAS_DIR" ] && ls "$PERSONAS_DIR"/*.md >/dev/null 2>&1; then
     # Extract frontmatter fields: name, description, validates
     PNAME=$(sed -n 's/^name: *//p' "$pfile" | head -1)
     PDESC=$(sed -n 's/^description: *//p' "$pfile" | head -1)
-    PVALIDATES=$(sed -n '/^validates:/,/^---/{/^  - /s/^  - //p}' "$pfile" | head -5 | sed 's/^/    - /')
+    PVALIDATES=$(awk '/^validates:/{found=1;next} /^---/{found=0} found && /^  - /{sub(/^  - /,""); print "    - " $0}' "$pfile" | head -5)
     PERSONA_SUMMARIES="${PERSONA_SUMMARIES}
 - **${PNAME}** — ${PDESC}
   Validates:
