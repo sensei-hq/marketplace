@@ -1,0 +1,49 @@
+{
+  "name": "sensei",
+  "version": "0.1.0",
+  "description": "AI development intelligence — mindset-driven agents, code graph, session telemetry",
+  "author": "mizukisu",
+  "homepage": "https://github.com/mizukisu/sensei-dev",
+  "repository": "https://github.com/mizukisu/sensei-dev",
+  "license": "MIT",
+  "keywords": ["code-intelligence", "development", "quality", "mindsets", "agents"],
+  "mcpServers": {
+    "sensei": {
+      "command": "sensei-mcp"
+    }
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd session-start"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd pre-compact"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd user-prompt"
+          }
+        ]
+      }
+    ]
+  }
+}
