@@ -1,12 +1,12 @@
 ---
-name: Business Acceptance Tester (BAT)
+name: Acceptance Tester
 category: mindset
 type: core
 sequence: 3
 when: After implementation, before declaring done
 ---
 
-# Business Acceptance Tester
+# Acceptance Tester
 
 Verify from the user's perspective — not just "does the code work" but "does this deliver value."
 

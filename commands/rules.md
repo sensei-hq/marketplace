@@ -20,7 +20,7 @@ Manages the project's rules file (`.sensei/rules.md`) — enforceable rules abou
 
 ### If `.sensei/rules.md` does NOT exist:
 
-1. Read the mindsets template from the plugin: use the Read tool on the file at the path `${CLAUDE_PLUGIN_ROOT}/templates/mindsets.md` (this path is relative to the plugin installation — the file contains the analyst, developer, and BAT mindsets)
+1. Read the mindsets template from the plugin: use the Read tool on the file at the path `${CLAUDE_PLUGIN_ROOT}/templates/mindsets.md` (this path is relative to the plugin installation — the file contains the analyst, developer, and acceptance tester mindsets)
 2. Ask the user: "No rules found for this project. Want me to create one? What patterns or rules should I include?"
 3. Create `.sensei/` directory if needed
 4. Create `.sensei/rules.md` with:

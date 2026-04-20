@@ -72,7 +72,7 @@ Freeform content: journey maps, examples, scenarios, acceptance stories.
 ## Important
 
 - Personas supplement mindsets, they don't replace them
-- Core mindsets (analyst, developer, BAT) apply to every task
+- Core mindsets (analyst, developer, acceptance tester) apply to every task
 - Specialist mindsets (UX, security, performance, DevOps) apply by domain
 - Personas add project-specific user perspectives on top
 - When validating, consider each persona independently — what's fine for a developer may confuse an end-user
