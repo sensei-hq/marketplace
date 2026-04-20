@@ -2,8 +2,8 @@
   "name": "sensei-mcp",
   "description": "Graph-powered code intelligence via sensei daemon",
   "mcp_server": {
-    "command": "senseid",
-    "args": ["--mcp"],
+    "command": "sensei-mcp",
+    "args": [],
     "env": {}
   },
   "supported_acps": ["claude-code", "cursor", "windsurf", "kiro", "opencode", "zed"],
