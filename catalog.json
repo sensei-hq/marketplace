@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
   "items": [
     {
       "name": "codebase-indexing",
@@ -90,8 +90,8 @@
       "recommended_for": ["all"],
       "stage": ["active"],
       "mcp_config": {
-        "command": "senseid",
-        "args": ["--mcp"]
+        "command": "sensei-mcp",
+        "args": []
       },
       "path": "plugins/sensei-mcp/config.json"
     },
@@ -372,6 +372,78 @@
       "recommended_for": ["all"],
       "stage": ["active"],
       "path": "commands/help.md"
+    },
+    {
+      "name": "analyst",
+      "kind": "agent",
+      "description": "Autonomous problem analysis — requirements, constraints, scope definition",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "agents/analyst.md"
+    },
+    {
+      "name": "developer",
+      "kind": "agent",
+      "description": "Verify implementation approach — file placement, patterns, test plan",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "agents/developer.md"
+    },
+    {
+      "name": "acceptance-tester",
+      "kind": "agent",
+      "description": "Acceptance testing — verify from user perspective, check criteria, regressions",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "agents/acceptance-tester.md"
+    },
+    {
+      "name": "ux-designer",
+      "kind": "agent",
+      "description": "Review interfaces for usability, accessibility, and consistency",
+      "scope": "project",
+      "recommended_for": ["frontend", "mobile"],
+      "stage": ["active"],
+      "path": "agents/ux-designer.md"
+    },
+    {
+      "name": "security-reviewer",
+      "kind": "agent",
+      "description": "Audit for OWASP, auth, data exposure, injection vectors",
+      "scope": "project",
+      "recommended_for": ["api", "backend"],
+      "stage": ["active"],
+      "path": "agents/security-reviewer.md"
+    },
+    {
+      "name": "performance-engineer",
+      "kind": "agent",
+      "description": "Analyze complexity, memory, network costs, scalability",
+      "scope": "project",
+      "recommended_for": ["backend", "api"],
+      "stage": ["active"],
+      "path": "agents/performance-engineer.md"
+    },
+    {
+      "name": "devops-sre",
+      "kind": "agent",
+      "description": "Check deployability, monitoring, rollback, failure modes",
+      "scope": "project",
+      "recommended_for": ["backend", "api"],
+      "stage": ["active"],
+      "path": "agents/devops-sre.md"
+    },
+    {
+      "name": "persona-reviewer",
+      "kind": "agent",
+      "description": "Review work from any persona perspective — loads personas dynamically",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "agents/persona-reviewer.md"
     },
     {
       "name": "session-start",
