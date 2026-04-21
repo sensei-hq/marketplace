@@ -1,11 +1,12 @@
 ---
 name: building-app-mockups
-description: Use when designing new UI pages, components, or layouts in a visual
-framework (SvelteKit, React, Next.js) — builds alternatives directly as real app
-pages at /mockups/a, /mockups/b using the project's actual components and styling,
-so design decisions happen in the real app, not in throwaway HTML.
-Also use before any significant layout change to compare options side-by-side
-without committing to one.
+description: >-
+  Use when designing new UI pages, components, or layouts in a visual
+  framework (SvelteKit, React, Next.js) — builds alternatives directly as real app
+  pages at /mockups/a, /mockups/b using the project's actual components and styling,
+  so design decisions happen in the real app, not in throwaway HTML.
+  Also use before any significant layout change to compare options side-by-side
+  without committing to one.
 ---
 
 # Building App Mockups

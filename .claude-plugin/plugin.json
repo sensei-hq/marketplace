@@ -2,7 +2,7 @@
   "name": "sensei",
   "version": "0.2.1",
   "description": "AI development intelligence — mindset-driven agents, code graph, session telemetry",
-  "author": "mizukisu",
+  "author": { "name": "mizukisu" },
   "homepage": "https://github.com/mizukisu/sensei-dev",
   "repository": "https://github.com/mizukisu/sensei-dev",
   "license": "MIT",

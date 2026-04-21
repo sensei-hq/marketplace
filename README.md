@@ -1,55 +1,33 @@
 # sensei-marketplace
 
-Skills, plugins, commands, and hooks for the [sensei](https://github.com/anthropics/sensei) AI coding companion.
-
-## Catalog
-
-| Kind | Count | Description |
-|------|-------|-------------|
-| Skills | 19 | Prompt-based enhancements for AI coding sessions |
-| Plugins | 3 | MCP servers (sensei, playwright, firebase) |
-| Commands | 13 | Slash commands (/commit, /feature, /audit, etc.) |
-| Hooks | 3 | Session lifecycle hooks (start, pre-tool, post-tool) |
+Skills, commands, agents, and hooks for the [sensei](https://github.com/mizukisu/sensei-dev) AI coding companion.
 
 ## Install
 
 ```bash
-# List all items
-bun run install.ts --list
+# Via sensei (recommended — handles marketplace registration + plugin install)
+sensei init
 
-# Install global skills to ~/.claude/
-bun run install.ts --global --scope global
-
-# Install to a project
-bun run install.ts --target /path/to/project --role frontend
-
-# Install specific item
-bun run install.ts --target . --item detecting-doc-drift
-
-# Install for Cursor instead of Claude Code
-bun run install.ts --target . --acp cursor
+# Or manually via Claude Code
+claude plugin marketplace add mizukisu/sensei-marketplace
+claude plugin install sensei
 ```
 
-## Catalog Schema
+Commands appear as `/sensei:session`, `/sensei:analyze`, etc.
 
-Each item in `catalog.json` has:
+## Contents
 
-| Field | Description |
-|-------|-------------|
-| `name` | Unique identifier |
-| `kind` | skill, plugin, command, or hook |
-| `description` | Human-readable description |
-| `scope` | `global` (installed once) or `project` (per-repo) |
-| `recommended_for` | Project types: all, api, frontend, mobile, library, etc. |
-| `stage` | Project stages: init, active, maintenance |
-| `path` | Path to the item's content within this repo |
-| `mcp_config` | For plugins: MCP server command and args |
-| `event` | For hooks: which event triggers it |
+| Kind | Description |
+|------|-------------|
+| Commands | Slash commands (`/sensei:analyze`, `/sensei:build`, `/sensei:commit`, etc.) |
+| Skills | Prompt-based enhancements (codebase indexing, test gen, refactor, etc.) |
+| Agents | Mindset-driven subagents (analyst, developer, acceptance tester, etc.) |
+| Hooks | Session lifecycle hooks (start, pre-tool, post-tool) |
 
 ## ACP Support
 
-Plugins auto-configure for supported AI Coding Platforms:
-- **Claude Code** — `.claude/plugins/<name>/plugin.json`
+`sensei init` auto-detects installed AI coding platforms:
+- **Claude Code** — installs as a plugin (commands, skills, agents, hooks, MCP)
 - **Cursor** — `.cursor/mcp.json`
 - **Windsurf** — `.windsurf/mcp.json`
-- **Kiro**, **OpenCode**, **Zed** — generic MCP config
+- **Zed**, **Kiro**, **OpenCode**, **VS Code** — MCP config
