@@ -52,7 +52,7 @@ Prefer sensei MCP tools over grep/sed:
 - get_callers()/get_callees() for dependencies
 - get_lib_docs() for library documentation
 
-Run /sensei:refocus for full orientation after compaction.
+Run /sensei:session refocus for full orientation after compaction.
 </sensei-refocus>"
 
 ESCAPED=$(escape_for_json "$CONTEXT")

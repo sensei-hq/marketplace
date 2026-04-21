@@ -81,7 +81,7 @@ run_test "includes tool reminder" "pre-compact" \
   "import sys,json; d=json.load(sys.stdin); assert 'search()' in d['additional_context']"
 
 run_test "suggests refocus" "pre-compact" \
-  "import sys,json; d=json.load(sys.stdin); assert '/sensei:refocus' in d['additional_context']"
+  "import sys,json; d=json.load(sys.stdin); assert '/sensei:session refocus' in d['additional_context']"
 
 run_test "no-rules message when missing" "pre-compact" \
   "import sys,json; d=json.load(sys.stdin); assert 'No project rules' in d['additional_context']"
