@@ -1,0 +1,19 @@
+{
+  "name": "sensei-marketplace",
+  "description": "Skills, commands, agents, and hooks for the sensei AI coding companion",
+  "owner": {
+    "name": "mizukisu"
+  },
+  "plugins": [
+    {
+      "name": "sensei",
+      "description": "AI development intelligence — mindset-driven agents, code graph, session telemetry",
+      "version": "0.2.1",
+      "author": {
+        "name": "mizukisu"
+      },
+      "source": "./plugins/sensei",
+      "category": "development"
+    }
+  ]
+}
