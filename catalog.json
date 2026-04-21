@@ -230,85 +230,31 @@
       "path": "commands/patterns.md"
     },
     {
-      "name": "pattern-extract",
+      "name": "agent",
       "kind": "command",
-      "description": "Extract a reusable pattern from existing code and write it to PATTERNS.md",
+      "description": "List available agents or invoke one by name",
       "scope": "project",
       "recommended_for": ["all"],
       "stage": ["active"],
-      "path": "commands/pattern-extract.md"
+      "path": "commands/agent.md"
     },
     {
-      "name": "pattern-use",
+      "name": "spec",
       "kind": "command",
-      "description": "Look up a pattern by name and apply it to the current task",
+      "description": "Reverse-engineer docs — product overview, feature deep-dive, or security audit",
       "scope": "project",
       "recommended_for": ["all"],
       "stage": ["active"],
-      "path": "commands/pattern-use.md"
+      "path": "commands/spec.md"
     },
     {
-      "name": "refocus",
+      "name": "docs",
       "kind": "command",
-      "description": "Re-anchor on current task after drift or compaction — reload state, plan, rules",
-      "scope": "project",
-      "recommended_for": ["all"],
-      "stage": ["active"],
-      "path": "commands/refocus.md"
-    },
-    {
-      "name": "status",
-      "kind": "command",
-      "description": "Show current workflow state — phase, task, issue, rules, patterns, docs, tools",
-      "scope": "project",
-      "recommended_for": ["all"],
-      "stage": ["active"],
-      "path": "commands/status.md"
-    },
-    {
-      "name": "product",
-      "kind": "command",
-      "description": "Reverse-engineer the full product — generates openspec/product/ docs",
-      "scope": "project",
-      "recommended_for": ["all"],
-      "stage": ["active"],
-      "path": "commands/product.md"
-    },
-    {
-      "name": "feature",
-      "kind": "command",
-      "description": "Plan and implement a new feature end-to-end",
-      "scope": "project",
-      "recommended_for": ["all"],
-      "stage": ["active"],
-      "path": "commands/feature.md"
-    },
-    {
-      "name": "audit",
-      "kind": "command",
-      "description": "Audit codebase for quality, security, and best practices",
-      "scope": "project",
-      "recommended_for": ["all"],
-      "stage": ["maintenance"],
-      "path": "commands/audit.md"
-    },
-    {
-      "name": "backlog",
-      "kind": "command",
-      "description": "Manage project backlog items",
-      "scope": "project",
-      "recommended_for": ["all"],
-      "stage": ["active"],
-      "path": "commands/backlog.md"
-    },
-    {
-      "name": "get-api-docs",
-      "kind": "command",
-      "description": "Fetch documentation for a third-party library, SDK, or API before writing code that uses it",
+      "description": "Fetch library documentation before writing code that uses it",
       "scope": "global",
       "recommended_for": ["all"],
       "stage": ["active"],
-      "path": "commands/get-api-docs.md"
+      "path": "commands/docs.md"
     },
     {
       "name": "commit",
@@ -331,7 +277,7 @@
     {
       "name": "session",
       "kind": "command",
-      "description": "Manage coding sessions — start, stop, status",
+      "description": "Session management — resume, show state, re-anchor, list open work",
       "scope": "global",
       "recommended_for": ["all"],
       "stage": ["active"],
@@ -345,24 +291,6 @@
       "recommended_for": ["frontend", "mobile"],
       "stage": ["init"],
       "path": "commands/mockup.md"
-    },
-    {
-      "name": "enable",
-      "kind": "command",
-      "description": "Enable an opt-in skill for this project",
-      "scope": "project",
-      "recommended_for": ["all"],
-      "stage": ["active"],
-      "path": "commands/enable.md"
-    },
-    {
-      "name": "disable",
-      "kind": "command",
-      "description": "Disable an opt-in skill for this project",
-      "scope": "project",
-      "recommended_for": ["all"],
-      "stage": ["active"],
-      "path": "commands/disable.md"
     },
     {
       "name": "help",

@@ -1,9 +1,9 @@
 ---
-description: Fetch documentation for a third-party library before writing code that uses it
+description: Fetch library documentation before writing code that uses it
 argument-hint: <library-name> [component]
 ---
 
-# Get API / Library Docs
+# Library Docs
 
 When you need documentation for a library, SDK, or API — fetch it from the sensei
 index rather than guessing from training data. This gives you current, correct docs.

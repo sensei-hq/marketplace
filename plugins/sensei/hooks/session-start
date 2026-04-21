@@ -101,7 +101,7 @@ STATE_SECTION=""
 if [ -f "$STATE_FILE" ]; then
   STATE_SECTION="## Workflow State
 $(cat "$STATE_FILE")
-Run /sensei:status for full orientation. Run /sensei:refocus to re-anchor."
+Run /sensei:session status for full orientation. Run /sensei:session refocus to re-anchor."
 fi
 
 # ── Build context ────────────────────────────────────────────────────────────
@@ -148,9 +148,9 @@ You MUST use sensei MCP tools instead of grep/glob for code navigation. These to
 ## Workflow Commands
 
 **Phase:** /sensei:idea, /sensei:analyze, /sensei:blueprint, /sensei:experiment, /sensei:plan, /sensei:build, /sensei:validate
-**Cross-cutting:** /sensei:brainstorm, /sensei:review, /sensei:persona
-**Refocus:** /sensei:rules, /sensei:refocus, /sensei:status, /sensei:tools, /sensei:patterns
-**Utility:** /sensei:session, /sensei:checkpoint, /sensei:commit, /sensei:mockup, /sensei:pattern-extract, /sensei:get-api-docs, /sensei:help
+**Cross-cutting:** /sensei:brainstorm, /sensei:review, /sensei:persona, /sensei:agent
+**Context:** /sensei:session, /sensei:rules, /sensei:patterns
+**Utility:** /sensei:spec, /sensei:checkpoint, /sensei:commit, /sensei:mockup, /sensei:docs, /sensei:help
 </sensei-session>
 
 <package-manager-rule>
