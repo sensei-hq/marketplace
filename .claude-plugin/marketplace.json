@@ -8,7 +8,7 @@
     {
       "name": "sensei",
       "description": "AI development intelligence — mindset-driven agents, code graph, session telemetry",
-      "version": "0.2.6",
+      "version": "0.2.7",
       "author": {
         "name": "mizukisu"
       },
