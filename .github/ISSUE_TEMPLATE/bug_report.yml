@@ -1,0 +1,66 @@
+name: Bug Report
+description: Report a bug with a skill, command, agent, or hook
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill out the details below.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the bug.
+      placeholder: Describe what went wrong.
+    validations:
+      required: true
+
+  - type: input
+    id: component
+    attributes:
+      label: Command / Skill / Agent / Hook affected
+      description: Which marketplace component is affected?
+      placeholder: e.g. plugins/semgrep, commands/commit
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce this issue?
+      placeholder: |
+        1. Run '...'
+        2. Observe '...'
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: assistant
+    attributes:
+      label: AI assistant
+      description: Which AI coding assistant were you using?
+      options:
+        - Claude Code
+        - Copilot
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Any other context, logs, or screenshots.
+    validations:
+      required: false
