@@ -7,7 +7,7 @@ The plugin communicates with the sensei daemon (MCP server) to index your codeba
 ## Installation
 
 ```bash
-brew install mizukisu/tap/sensei && sensei init
+brew install sensei-hq/tap/sensei && sensei init
 ```
 
 `sensei init` detects your AI coding platform and installs the plugin automatically. Commands appear as `/sensei:idea`, `/sensei:build`, `/sensei:session`, etc.

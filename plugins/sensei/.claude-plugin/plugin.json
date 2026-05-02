@@ -3,10 +3,10 @@
   "version": "0.2.13",
   "description": "AI development intelligence — mindset-driven agents, code graph, session telemetry",
   "author": {
-    "name": "mizukisu"
+    "name": "sensei-hq"
   },
-  "homepage": "https://github.com/mizukisu/sensei-dev",
-  "repository": "https://github.com/mizukisu/sensei-dev",
+  "homepage": "https://www.sensei-hq.com",
+  "repository": "https://github.com/sensei-hq/sensei",
   "license": "MIT",
   "keywords": [
     "code-intelligence",

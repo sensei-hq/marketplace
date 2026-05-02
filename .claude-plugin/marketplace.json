@@ -2,7 +2,7 @@
   "name": "sensei-marketplace",
   "description": "Skills, commands, agents, and hooks for the sensei AI coding companion",
   "owner": {
-    "name": "mizukisu"
+    "name": "sensei-hq"
   },
   "plugins": [
     {
@@ -10,7 +10,7 @@
       "description": "AI development intelligence — mindset-driven agents, code graph, session telemetry",
       "version": "0.2.13",
       "author": {
-        "name": "mizukisu"
+        "name": "sensei-hq"
       },
       "source": "./plugins/sensei",
       "category": "development"
