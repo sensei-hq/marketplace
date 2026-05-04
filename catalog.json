@@ -83,6 +83,16 @@
       "path": "skills/analyze/SKILL.md"
     },
     {
+      "name": "tauri-playwright-testing",
+      "kind": "skill",
+      "description": "E2E testing guide for Tauri desktop apps — build flags, globalSetup, navigation caveats, TauriPage API quirks, and build-time test-mode configuration",
+      "scope": "project",
+      "recommended_for": ["desktop", "frontend", "tauri"],
+      "stage": ["active"],
+      "tags": ["tauri", "playwright", "testing", "guidelines", "tips", "e2e"],
+      "path": "skills/tauri-playwright-testing/SKILL.md"
+    },
+    {
       "name": "sensei-mcp",
       "kind": "plugin",
       "description": "Graph-powered code intelligence — search symbols, trace calls, query architecture",
