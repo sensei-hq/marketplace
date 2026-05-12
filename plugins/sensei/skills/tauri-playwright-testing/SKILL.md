@@ -18,7 +18,7 @@ Stack: Tauri 2, any web frontend (SvelteKit, React, Vue, etc.), TypeScript, Play
 ```
 globalSetup.ts
   ├── Build senseid / sidecar daemons (if any)
-  ├── Build Sensei.app --features e2e-testing + VITE_SENSEI_MODE=dev
+  ├── Build Sensei.app --features dev,e2e-testing
   ├── Kill stale process + remove stale socket
   ├── Launch app with test env vars
   └── Wait for Playwright socket (/tmp/tauri-playwright.sock)
@@ -62,22 +62,22 @@ cargo tauri build --debug --features e2e-testing
 
 **Solution:** Bake the config into the build via Vite env vars. Vite replaces `import.meta.env.VITE_*` values at build time — they become synchronous constants with no async overhead.
 
-### Setting the env var in globalSetup
+### Building with dev + e2e features in globalSetup
 
 ```typescript
-execFileSync('cargo', ['tauri', 'build', '--debug', '--features', 'e2e-testing'], {
+execFileSync('cargo', ['tauri', 'build', '--debug', '--features', 'dev,e2e-testing'], {
   cwd: join(APP_REPO, 'src-tauri'),
   stdio: 'inherit',
-  // Vite will replace import.meta.env.VITE_SENSEI_MODE with 'dev' in the built output
-  env: { ...process.env, VITE_SENSEI_MODE: 'dev' },
 });
 ```
 
-### Reading in the frontend
+Mode is compile-time via the `dev` Cargo feature — no env vars needed.
+
+### Checking mode in the frontend
 
 ```typescript
-// Top-level (outside onMount) — evaluated at module load, synchronous
-const isDevBuild = import.meta.env.VITE_SENSEI_MODE === 'dev';
+// Build-time port injection from vite.config.ts
+declare const __SENSEI_DEFAULT_PORT__: number;
 ```
 
 ```svelte

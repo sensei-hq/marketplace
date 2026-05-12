@@ -1,5 +1,5 @@
 {
-  "version": "0.2.1",
+  "version": "0.2.14",
   "items": [
     {
       "name": "codebase-indexing",
@@ -115,8 +115,7 @@
       "mcp_config": {
         "command": "npx",
         "args": ["@anthropic/mcp-playwright"]
-      },
-      "path": "plugins/playwright-mcp/config.json"
+      }
     },
     {
       "name": "firebase-mcp",
@@ -128,8 +127,7 @@
       "mcp_config": {
         "command": "npx",
         "args": ["@anthropic/mcp-firebase"]
-      },
-      "path": "plugins/firebase-mcp/config.json"
+      }
     },
     {
       "name": "idea",
@@ -312,7 +310,7 @@
       "path": "commands/help.md"
     },
     {
-      "name": "analyst",
+      "name": "sensei-analyst",
       "kind": "agent",
       "description": "Autonomous problem analysis — requirements, constraints, scope definition",
       "scope": "project",
@@ -321,7 +319,7 @@
       "path": "agents/analyst.md"
     },
     {
-      "name": "developer",
+      "name": "sensei-developer",
       "kind": "agent",
       "description": "Verify implementation approach — file placement, patterns, test plan",
       "scope": "project",
@@ -330,7 +328,7 @@
       "path": "agents/developer.md"
     },
     {
-      "name": "acceptance-tester",
+      "name": "sensei-acceptance-tester",
       "kind": "agent",
       "description": "Acceptance testing — verify from user perspective, check criteria, regressions",
       "scope": "project",
@@ -339,7 +337,7 @@
       "path": "agents/acceptance-tester.md"
     },
     {
-      "name": "ux-designer",
+      "name": "sensei-ux-designer",
       "kind": "agent",
       "description": "Review interfaces for usability, accessibility, and consistency",
       "scope": "project",
@@ -348,7 +346,7 @@
       "path": "agents/ux-designer.md"
     },
     {
-      "name": "security-reviewer",
+      "name": "sensei-security-reviewer",
       "kind": "agent",
       "description": "Audit for OWASP, auth, data exposure, injection vectors",
       "scope": "project",
@@ -357,7 +355,7 @@
       "path": "agents/security-reviewer.md"
     },
     {
-      "name": "performance-engineer",
+      "name": "sensei-performance-engineer",
       "kind": "agent",
       "description": "Analyze complexity, memory, network costs, scalability",
       "scope": "project",
@@ -366,7 +364,7 @@
       "path": "agents/performance-engineer.md"
     },
     {
-      "name": "devops-sre",
+      "name": "sensei-devops-sre",
       "kind": "agent",
       "description": "Check deployability, monitoring, rollback, failure modes",
       "scope": "project",
@@ -375,7 +373,7 @@
       "path": "agents/devops-sre.md"
     },
     {
-      "name": "persona-reviewer",
+      "name": "sensei-persona-reviewer",
       "kind": "agent",
       "description": "Review work from any persona perspective — loads personas dynamically",
       "scope": "project",
@@ -400,7 +398,7 @@
       "scope": "global",
       "recommended_for": ["all"],
       "stage": ["active"],
-      "event": "PreToolExecution",
+      "event": "PreToolUse",
       "path": "hooks/pre-tool"
     },
     {
@@ -410,7 +408,7 @@
       "scope": "global",
       "recommended_for": ["all"],
       "stage": ["active"],
-      "event": "PostToolExecution",
+      "event": "PostToolUse",
       "path": "hooks/post-tool"
     }
   ]
