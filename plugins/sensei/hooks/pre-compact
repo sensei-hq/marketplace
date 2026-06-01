@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+source "$(dirname "$0")/_lib.sh"
+
 PROJECT_ROOT="${CLAUDE_PROJECT_ROOT:-${PWD}}"
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
+
+# Forward telemetry first so the event reaches the daemon even if the
+# context-building below fails.
+read_stdin_payload
+send_telemetry "$PAYLOAD"
 
 escape_for_json() {
   local s="$1"

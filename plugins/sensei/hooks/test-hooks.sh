@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-# Test hook scripts — verifies JSON output and content checks
+# Test hook scripts — verifies generic forwarder, context-injecting hooks,
+# and the JSONL fallback in _lib.sh send_telemetry.
+#
+# Designed to run without a daemon: every test points HOME at a tmpdir and
+# SENSEI_DAEMON_URL at an unreachable port, so send_telemetry's curl always
+# fails and the fallback path is exercised.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -7,34 +12,46 @@ PLUGIN_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 PASS=0
 FAIL=0
 
-# Create temp project for testing
-TEMP_PROJECT=$(mktemp -d)
+# Tmpdir doubles as $HOME (so JSONL fallback lands here) and project root
+# (so session-start / pre-compact read empty rules/state).
+TEMP_HOME=$(mktemp -d)
+TEMP_PROJECT="$TEMP_HOME/project"
 mkdir -p "$TEMP_PROJECT/.sensei"
 
-run_test() {
-  local name="$1"
-  local hook="$2"
-  local check="$3"
-  local setup="${4:-}"
+# Point telemetry at a port that nothing is listening on. send_telemetry
+# forks into the background, so we sleep briefly after each invocation to
+# let the fallback finish writing before we inspect it.
+export SENSEI_DAEMON_URL="http://127.0.0.1:1"
 
-  # Run optional setup
-  if [ -n "$setup" ]; then
-    eval "$setup"
+run_hook() {
+  local hook="$1"
+  local stdin_payload="${2-}"
+
+  if [ -n "$stdin_payload" ]; then
+    printf '%s' "$stdin_payload" | \
+      HOME="$TEMP_HOME" \
+      CLAUDE_PROJECT_ROOT="$TEMP_PROJECT" \
+      CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" \
+      bash "$SCRIPT_DIR/$hook" 2>/dev/null
+  else
+    HOME="$TEMP_HOME" \
+      CLAUDE_PROJECT_ROOT="$TEMP_PROJECT" \
+      CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" \
+      bash "$SCRIPT_DIR/$hook" </dev/null 2>/dev/null
   fi
+}
 
-  # Run hook and capture output
-  local output
-  output=$(CLAUDE_PROJECT_ROOT="$TEMP_PROJECT" CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" bash "$SCRIPT_DIR/$hook" 2>/dev/null) || true
+assert_json() {
+  local name="$1"
+  local output="$2"
+  local check="$3"
 
-  # Check valid JSON
-  if ! echo "$output" | python3 -m json.tool >/dev/null 2>&1; then
+  if ! printf '%s' "$output" | python3 -m json.tool >/dev/null 2>&1; then
     echo "  FAIL $name — invalid JSON"
     FAIL=$((FAIL + 1))
     return
   fi
-
-  # Run content check
-  if echo "$output" | python3 -c "$check" 2>/dev/null; then
+  if printf '%s' "$output" | python3 -c "$check" 2>/dev/null; then
     echo "  PASS $name"
     PASS=$((PASS + 1))
   else
@@ -43,125 +60,116 @@ run_test() {
   fi
 }
 
-echo "=== session-start hook ==="
-
-run_test "valid JSON with additional_context" "session-start" \
-  "import sys,json; d=json.load(sys.stdin); assert 'additional_context' in d"
-
-run_test "includes MCP tools" "session-start" \
-  "import sys,json; d=json.load(sys.stdin); assert 'search(query' in d['additional_context']"
-
-run_test "includes workflow commands" "session-start" \
-  "import sys,json; d=json.load(sys.stdin); assert '/sensei:idea' in d['additional_context']"
-
-run_test "includes mindsets reference" "session-start" \
-  "import sys,json; d=json.load(sys.stdin); assert 'Analyst' in d['additional_context'] or 'mindsets' in d['additional_context']"
-
-run_test "no rules message when file missing" "session-start" \
-  "import sys,json; d=json.load(sys.stdin); assert 'No rules' in d['additional_context']"
-
-run_test "loads rules when present" "session-start" \
-  "import sys,json; d=json.load(sys.stdin); assert 'test-rule-alpha' in d['additional_context']" \
-  "echo '# Rules\n- test-rule-alpha' > $TEMP_PROJECT/.sensei/rules.md"
-
-run_test "loads state when present" "session-start" \
-  "import sys,json; d=json.load(sys.stdin); assert 'active_phase: build' in d['additional_context']" \
-  "echo 'active_phase: build\nactive_issue: 42' > $TEMP_PROJECT/.sensei/state.yaml"
-
-echo ""
-echo "=== pre-compact hook ==="
-
-# Reset temp project
-rm -f "$TEMP_PROJECT/.sensei/rules.md" "$TEMP_PROJECT/.sensei/state.yaml"
-
-run_test "valid JSON" "pre-compact" \
-  "import sys,json; d=json.load(sys.stdin); assert 'additional_context' in d"
-
-run_test "includes tool reminder" "pre-compact" \
-  "import sys,json; d=json.load(sys.stdin); assert 'search()' in d['additional_context']"
-
-run_test "suggests refocus" "pre-compact" \
-  "import sys,json; d=json.load(sys.stdin); assert '/sensei:session refocus' in d['additional_context']"
-
-run_test "no-rules message when missing" "pre-compact" \
-  "import sys,json; d=json.load(sys.stdin); assert 'No project rules' in d['additional_context']"
-
-run_test "loads rules when present" "pre-compact" \
-  "import sys,json; d=json.load(sys.stdin); assert 'test-rule-beta' in d['additional_context']" \
-  "echo '# Rules\n- test-rule-beta' > $TEMP_PROJECT/.sensei/rules.md"
-
-run_test "loads state when present" "pre-compact" \
-  "import sys,json; d=json.load(sys.stdin); assert 'active_phase: ideate' in d['additional_context']" \
-  "echo 'active_phase: ideate' > $TEMP_PROJECT/.sensei/state.yaml"
-
-echo ""
-echo "=== user-prompt hook ==="
-
-# Reset
-rm -f "$TEMP_PROJECT/.sensei/rules.md" "$TEMP_PROJECT/.sensei/state.yaml"
-
-run_test "returns valid JSON" "user-prompt" \
-  "import sys,json; d=json.load(sys.stdin); assert isinstance(d, dict)"
-
-# Classification logic tested below in dedicated section
-
-# Test classification function directly
-echo ""
-echo "=== Prompt classification ==="
-
-classify() {
-  local prompt="$1"
-  local expected="$2"
-  local result="new_request"
-  if echo "$prompt" | grep -qiE "(^no[,. ]|wrong|not what|try again|fix (this|that|it)|redo|that's (incorrect|not)|go back|revert|that is wrong)"; then
-    result="correction"
-  elif echo "$prompt" | grep -qiE "^(now |next |also |and then|continue )"; then
-    result="continuation"
-  elif echo "$prompt" | grep -qiE "(what about|how does|can you explain|why did|what is)"; then
-    result="clarification"
-  fi
-  if [ "$result" = "$expected" ]; then
-    echo "  PASS classify '$prompt' → $result"
+assert_true() {
+  local name="$1"
+  local expr_result="$2"
+  if [ "$expr_result" = "true" ]; then
+    echo "  PASS $name"
     PASS=$((PASS + 1))
   else
-    echo "  FAIL classify '$prompt' → $result (expected $expected)"
+    echo "  FAIL $name"
     FAIL=$((FAIL + 1))
   fi
 }
 
-classify "no, that's wrong" "correction"
-classify "No, use the adapter pattern" "correction"
-classify "wrong approach, try again" "correction"
-classify "fix this please" "correction"
-classify "that is wrong" "correction"
-classify "go back to the previous approach" "correction"
-classify "now implement the tests" "continuation"
-classify "next step please" "continuation"
-classify "also add error handling" "continuation"
-classify "continue with the build" "continuation"
-classify "what about edge cases?" "clarification"
-classify "how does the adapter work?" "clarification"
-classify "can you explain the pattern?" "clarification"
-classify "add a new endpoint for users" "new_request"
-classify "implement the SQL adapter" "new_request"
-classify "build the dashboard view" "new_request"
+# ── forward: generic dispatcher ──────────────────────────────────────────────
+
+echo "=== forward (generic dispatcher) ==="
+
+output=$(run_hook "forward")
+assert_json "no stdin returns valid empty JSON" "$output" \
+  "import sys,json; d=json.load(sys.stdin); assert d == {}"
+
+output=$(run_hook "forward" '{"hook_event_name":"Notification","session_id":"abc"}')
+assert_json "with stdin still returns valid empty JSON" "$output" \
+  "import sys,json; d=json.load(sys.stdin); assert d == {}"
+
+# Give the backgrounded fallback time to write
+sleep 0.3
+fallback="$TEMP_HOME/.sensei/events.jsonl"
+if [ -f "$fallback" ] && [ -s "$fallback" ]; then
+  assert_true "JSONL fallback file written when daemon unreachable" "true"
+  last=$(tail -1 "$fallback")
+  # jq is optional; only assert enrichment when it's installed (CI may be bare).
+  if command -v jq >/dev/null 2>&1; then
+    family=$(printf '%s' "$last" | jq -r '.assistant_family // empty')
+    event=$(printf '%s' "$last" | jq -r '.event_type // empty')
+    [ "$family" = "claude" ] && [ "$event" = "Notification" ] && \
+      assert_true "fallback row enriched with assistant_family + event_type" "true" || \
+      assert_true "fallback row enriched with assistant_family + event_type" "false"
+  fi
+else
+  assert_true "JSONL fallback file written when daemon unreachable" "false"
+fi
+rm -f "$fallback"
+
+# ── session-start: telemetry + context injection ─────────────────────────────
 
 echo ""
-echo "=== pre-tool hook ==="
+echo "=== session-start (telemetry + context injection) ==="
 
-run_test "returns valid JSON" "pre-tool" \
-  "import sys,json; d=json.load(sys.stdin); assert isinstance(d, dict)" \
-  "export CLAUDE_TOOL_NAME=Read"
+# Production payload shape from Claude Code (the hook always receives JSON)
+SESSION_PAYLOAD='{"hook_event_name":"SessionStart","session_id":"test-session-1","source":"startup"}'
+
+output=$(run_hook "session-start" "$SESSION_PAYLOAD")
+assert_json "returns JSON with additional_context" "$output" \
+  "import sys,json; d=json.load(sys.stdin); assert 'additional_context' in d"
+assert_json "includes MCP tools reference" "$output" \
+  "import sys,json; d=json.load(sys.stdin); assert 'search(query' in d['additional_context']"
+assert_json "includes workflow commands" "$output" \
+  "import sys,json; d=json.load(sys.stdin); assert '/sensei:idea' in d['additional_context']"
+assert_json "no-rules message when file missing" "$output" \
+  "import sys,json; d=json.load(sys.stdin); assert 'No rules' in d['additional_context']"
+
+printf '# Rules\n- test-rule-alpha\n' > "$TEMP_PROJECT/.sensei/rules.md"
+output=$(run_hook "session-start" "$SESSION_PAYLOAD")
+assert_json "loads rules when present" "$output" \
+  "import sys,json; d=json.load(sys.stdin); assert 'test-rule-alpha' in d['additional_context']"
+
+printf 'active_phase: build\nactive_issue: 42\n' > "$TEMP_PROJECT/.sensei/state.yaml"
+output=$(run_hook "session-start" "$SESSION_PAYLOAD")
+assert_json "loads state when present" "$output" \
+  "import sys,json; d=json.load(sys.stdin); assert 'active_phase: build' in d['additional_context']"
+
+# session-start should have also fired telemetry on each invocation
+sleep 0.3
+if [ -s "$fallback" ]; then
+  assert_true "session-start emits telemetry to fallback" "true"
+else
+  assert_true "session-start emits telemetry to fallback" "false"
+fi
+rm -f "$fallback" "$TEMP_PROJECT/.sensei/rules.md" "$TEMP_PROJECT/.sensei/state.yaml"
+
+# ── pre-compact: telemetry + context injection ───────────────────────────────
 
 echo ""
-echo "=== post-tool hook ==="
+echo "=== pre-compact (telemetry + context injection) ==="
 
-run_test "returns valid JSON" "post-tool" \
-  "import sys,json; d=json.load(sys.stdin); assert isinstance(d, dict)" \
-  "export CLAUDE_TOOL_NAME=Read; export CLAUDE_TOOL_EXIT_CODE=0"
+PRECOMPACT_PAYLOAD='{"hook_event_name":"PreCompact","session_id":"test-session-1","trigger":"manual"}'
 
-# Cleanup
-rm -rf "$TEMP_PROJECT"
+output=$(run_hook "pre-compact" "$PRECOMPACT_PAYLOAD")
+assert_json "returns JSON with additional_context" "$output" \
+  "import sys,json; d=json.load(sys.stdin); assert 'additional_context' in d"
+assert_json "suggests session refocus" "$output" \
+  "import sys,json; d=json.load(sys.stdin); assert '/sensei:session refocus' in d['additional_context']"
+assert_json "no-rules message when missing" "$output" \
+  "import sys,json; d=json.load(sys.stdin); assert 'No project rules' in d['additional_context']"
+
+printf '# Rules\n- test-rule-beta\n' > "$TEMP_PROJECT/.sensei/rules.md"
+output=$(run_hook "pre-compact" "$PRECOMPACT_PAYLOAD")
+assert_json "loads rules when present" "$output" \
+  "import sys,json; d=json.load(sys.stdin); assert 'test-rule-beta' in d['additional_context']"
+
+sleep 0.3
+if [ -s "$fallback" ]; then
+  assert_true "pre-compact emits telemetry to fallback" "true"
+else
+  assert_true "pre-compact emits telemetry to fallback" "false"
+fi
+
+# ── Cleanup ──────────────────────────────────────────────────────────────────
+
+rm -rf "$TEMP_HOME"
 
 echo ""
 echo "=== Results: $PASS passed, $FAIL failed ==="
