@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Generic telemetry forwarder. Used for every Claude Code hook event that
+# does not need to inject context back into the session — most of them.
+# Reads the hook payload from stdin and POSTs it to the sensei daemon's
+# /hook/event endpoint, falling back to ~/.sensei/events.jsonl when the
+# daemon is unreachable. Returns an empty JSON object so Claude Code does
+# not interpret stdout as instructions.
+set -euo pipefail
+
+source "$(dirname "$0")/_lib.sh"
+
+read_stdin_payload
+send_telemetry "$PAYLOAD"
+
+echo '{}'
+exit 0

@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DAEMON_URL="http://127.0.0.1:7744"
+source "$(dirname "$0")/_lib.sh"
+
 PROJECT_ROOT="${CLAUDE_PROJECT_ROOT:-${PWD}}"
 PROJECT_NAME="$(basename "$PROJECT_ROOT")"
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
+
+# Capture the SessionStart payload and forward it to the daemon. Goes first
+# so telemetry fires even if any of the context-building steps below fail.
+read_stdin_payload
+send_telemetry "$PAYLOAD"
 
 escape_for_json() {
   local s="$1"
