@@ -17,7 +17,7 @@
   ],
   "mcpServers": {
     "sensei": {
-      "command": "sensei-mcp"
+      "command": "${CLAUDE_PLUGIN_ROOT}/bin/sensei-mcp.sh"
     }
   },
   "hooks": {
