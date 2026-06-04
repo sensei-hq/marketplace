@@ -5,22 +5,11 @@ source "$(dirname "$0")/_lib.sh"
 
 PROJECT_ROOT="${CLAUDE_PROJECT_ROOT:-${PWD}}"
 PROJECT_NAME="$(basename "$PROJECT_ROOT")"
-PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 
 # Capture the SessionStart payload and forward it to the daemon. Goes first
 # so telemetry fires even if any of the context-building steps below fail.
 read_stdin_payload
 send_telemetry "$PAYLOAD"
-
-escape_for_json() {
-  local s="$1"
-  s="${s//\\/\\\\}"
-  s="${s//\"/\\\"}"
-  s="${s//$'\n'/\\n}"
-  s="${s//$'\r'/\\r}"
-  s="${s//$'\t'/\\t}"
-  printf '%s' "$s"
-}
 
 # ── Create session on daemon ─────────────────────────────────────────────────
 SESSION_ID=$(uuidgen 2>/dev/null || python3 -c "import uuid; print(uuid.uuid4())" 2>/dev/null || echo "")
@@ -53,32 +42,12 @@ else
 No rules file found. Run /sensei:rules to create one."
 fi
 
-# ── Read mindsets (from .sensei/mindsets/ folder) ────────────────────────────
-MINDSETS_DIR="${PROJECT_ROOT}/.sensei/mindsets"
-MINDSETS_SECTION=""
-if [ -d "$MINDSETS_DIR" ] && ls "$MINDSETS_DIR"/*.md >/dev/null 2>&1; then
-  MINDSETS_SECTION="## Mindsets
+# ── Mindsets (shipped as subagents — lean reminder only) ─────────────────────
+# Mindsets are agents (plugin agents/). Inject a lean pointer, not the full
+# question set — the detail lives in each agent and loads on demand.
+MINDSETS_SECTION="## Mindsets
 
-Apply core three in sequence: Analyst -> Developer -> Acceptance Tester. Apply specialists when domain applies.
-"
-  for mfile in "$MINDSETS_DIR"/*.md; do
-    MNAME=$(sed -n 's/^name: *//p' "$mfile" | head -1)
-    MWHEN=$(sed -n 's/^when: *//p' "$mfile" | head -1)
-    # Extract questions (lines starting with number + dot + bold)
-    MQUESTIONS=$(awk '/^## Questions/{found=1;next} /^## /{found=0} found && /^[0-9]/' "$mfile" | head -7)
-    MINDSETS_SECTION="${MINDSETS_SECTION}
-### ${MNAME}
-*${MWHEN}*
-${MQUESTIONS}
-"
-  done
-else
-  # Fall back to single file in plugin templates
-  MINDSETS_FILE="${PLUGIN_ROOT}/templates/mindsets.md"
-  if [ -f "$MINDSETS_FILE" ]; then
-    MINDSETS_SECTION="$(sed '/^---$/,/^---$/d' "$MINDSETS_FILE" | head -120)"
-  fi
-fi
+Apply the core three in sequence: Analyst → Developer → Acceptance Tester. Add specialists (DevOps/SRE, Performance, Security, UX) when the domain applies. Each mindset is a subagent — run \`/sensei:agent <name>\` (e.g. \`/sensei:agent analyst\`) to do focused work wearing that hat."
 
 # ── Read personas ────────────────────────────────────────────────────────────
 PERSONAS_DIR="${PROJECT_ROOT}/.sensei/personas"

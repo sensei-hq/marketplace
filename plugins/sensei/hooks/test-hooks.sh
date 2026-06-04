@@ -118,6 +118,8 @@ assert_json "includes MCP tools reference" "$output" \
   "import sys,json; d=json.load(sys.stdin); assert 'search(query' in d['additional_context']"
 assert_json "includes workflow commands" "$output" \
   "import sys,json; d=json.load(sys.stdin); assert '/sensei:idea' in d['additional_context']"
+assert_json "injects lean mindset reminder (agents, not full dump)" "$output" \
+  "import sys,json; d=json.load(sys.stdin); c=d['additional_context']; assert '/sensei:agent' in c and 'Analyst' in c and 'Acceptance Tester' in c"
 assert_json "no-rules message when file missing" "$output" \
   "import sys,json; d=json.load(sys.stdin); assert 'No rules' in d['additional_context']"
 

@@ -65,13 +65,13 @@
       "path": "skills/identify-unknown-libs/SKILL.md"
     },
     {
-      "name": "ui-dummy-data",
+      "name": "ui-state-pattern",
       "kind": "skill",
-      "description": "Build UI pages with typed dummy data first, wire real data later — framework-agnostic",
+      "description": "Build UI screens with the Component → State → Load pattern — presentation-only components, state owns all changes, load swaps mock↔real",
       "scope": "project",
       "recommended_for": ["frontend", "mobile"],
       "stage": ["init", "active"],
-      "path": "skills/ui-dummy-data/SKILL.md"
+      "path": "skills/ui-state-pattern/SKILL.md"
     },
     {
       "name": "analyze",
@@ -267,7 +267,7 @@
     {
       "name": "commit",
       "kind": "command",
-      "description": "Create structured git commits with conventional format",
+      "description": "Run zero-errors checks then commit",
       "scope": "global",
       "recommended_for": ["all"],
       "stage": ["active", "maintenance"],
@@ -276,7 +276,7 @@
     {
       "name": "checkpoint",
       "kind": "command",
-      "description": "Record session checkpoint with progress summary",
+      "description": "Snapshot current progress for interruption recovery",
       "scope": "global",
       "recommended_for": ["all"],
       "stage": ["active"],
@@ -285,7 +285,7 @@
     {
       "name": "session",
       "kind": "command",
-      "description": "Session management — resume, show state, re-anchor, list open work",
+      "description": "Session management — resume, show state, re-anchor, or list open work",
       "scope": "global",
       "recommended_for": ["all"],
       "stage": ["active"],
@@ -294,7 +294,7 @@
     {
       "name": "mockup",
       "kind": "command",
-      "description": "Generate interactive UI mockups",
+      "description": "Start a mockup — enforces framework-native build, commits first",
       "scope": "project",
       "recommended_for": ["frontend", "mobile"],
       "stage": ["init"],
@@ -303,7 +303,7 @@
     {
       "name": "help",
       "kind": "command",
-      "description": "Show all available sensei commands and skills",
+      "description": "Show all available sensei commands, agents, and usage examples",
       "scope": "global",
       "recommended_for": ["all"],
       "stage": ["active"],

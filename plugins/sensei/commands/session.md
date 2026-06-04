@@ -16,13 +16,16 @@ argument-hint: "(none) | status | refocus | backlog"
 
 Parse `$ARGUMENTS`: take the first word (lowercased). If empty or absent, run **resume**. Otherwise dispatch to the matching sub-action.
 
+Call `log_event(type="command_invoked", data="{\"command\":\"session\",\"action\":\"$ARGUMENTS\"}")` — record the invocation.
+
 ---
 
 ### Resume (default — no args)
 
-1. Call `get_session_context(task_description="session startup")`.
-2. Review any open decisions or interrupted work it returns.
-3. Report back to the user: what's in progress, what's pending, any blockers.
+1. Call `get_workflow_state()` — active phase, task, issue, and last checkpoint.
+2. Call `get_layered_context()` — blended memory (decisions, conventions, recent learnings).
+3. Review any open decisions or interrupted work those calls surface.
+4. Report back to the user: what's in progress, what's pending, any blockers.
 
 ---
 
@@ -96,8 +99,8 @@ What's left: <brief statement of remaining work based on plan/issue>
 
 ### Backlog
 
-1. Call `get_session_context(task_description="backlog review")`.
-2. From the returned context, extract and categorize:
+1. Call `get_workflow_state()` and `get_layered_context()` to gather active work and remembered context.
+2. From the returned state, extract and categorize:
    - **Open decisions** — choices that have been deferred or need a resolution
    - **Pending tasks** — work that is planned but not started
    - **Blocked items** — work that cannot proceed until something else resolves

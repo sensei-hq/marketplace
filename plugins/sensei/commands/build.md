@@ -51,7 +51,7 @@ Before writing code, plan the structure:
 1. Identify pure functions needed (data transformation, no side effects)
 2. Identify the orchestrator (thin wrapper that calls pure functions + handles side effects)
 3. Identify boundaries (DB, filesystem, HTTP — mock at these boundaries)
-4. If `.sensei/personas.yaml` exists: consider each persona's goals — does the decomposition serve their needs?
+4. If `.sensei/personas/*.md` exist: consider each persona's goals — does the decomposition serve their needs?
 
 Present the decomposition to the user:
 "I'll create [N] functions:

@@ -13,21 +13,17 @@ Generate accurate, minimal documentation from existing code. Avoids writing docs
 
 ### Step 1 — Map the module
 ```
-call: get_bearings("<module path>")
+call: search("<module path or key symbol>")
 ```
-Get all exports. This is the documentation surface.
+`Read` the module's entry file to enumerate its exports. This is the documentation surface.
 
 ### Step 2 — Load each export
 For each exported symbol:
 ```
-call: get_symbol("<name>", depth=1)
+call: get_callers("<name>")
+call: get_callees("<name>")
 ```
-Note: signature, what it calls, what calls it.
-
-For complex functions (depth > 1 needed):
-```
-call: load_context("<file path>")
-```
+Note: signature, what it calls, what calls it. For complex functions, `Read` the implementation directly.
 
 ### Step 3 — Write documentation
 
@@ -56,11 +52,7 @@ Before finalising each doc:
 
 ### Step 5 — Record coverage
 ```
-call: record_memory({
-  type: "decision",
-  title: "Documented: <module name>",
-  content: "<N> exports documented; coverage complete as of <date>"
-})
+call: propose_memory(scope="project", type="decision", title="Documented: <module name>", content="<N> exports documented; coverage complete as of <date>", triage_signal="docs_extracted")
 ```
 
 ## Documentation Anti-patterns

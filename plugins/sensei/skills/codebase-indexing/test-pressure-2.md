@@ -2,7 +2,7 @@
 
 IMPORTANT: This is a real task. Act as you would in a real session.
 
-You have the superpowers:codebase-indexing skill available.
+You have the sensei:codebase-indexing skill available.
 
 ---
 

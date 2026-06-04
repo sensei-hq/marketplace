@@ -27,7 +27,7 @@ Scan a repo once, produce structured artifacts so future agents orient in ~500 t
 ls .sensei/ 2>/dev/null && cat .sensei/llmspec.yaml 2>/dev/null
 ```
 
-If index exists and is recent (< 7 days or no major commits since), call `get_llmspec()` MCP tool and stop — no need to re-index.
+If index exists and is recent (< 7 days or no major commits since), read `.sensei/llmspec.yaml` and stop — no need to re-index.
 
 ### Step 2: Run the indexer
 
@@ -43,11 +43,7 @@ This scans the repo using the extractor guide and writes all output artifacts to
 
 **Step 3a: Orient**
 
-```
-call: get_llmspec()
-```
-
-Note every field that is TODO, empty, or missing — including `docs[]`.
+Read `.sensei/llmspec.yaml`. Note every field that is TODO, empty, or missing — including `docs[]`.
 
 **Step 3b: Fill `description`**
 
@@ -55,7 +51,7 @@ Read `README.md` at L1. Write a one-sentence summary and update the field.
 
 **Step 3c: Fill `entry_points`**
 
-Read `package.json` for `bin` entries. In a monorepo, check workspace package manifests if root has no `bin`. Call `list_exports(path)` for each entry point found. Write each with a `role` phrase.
+Read `package.json` for `bin` entries. In a monorepo, check workspace package manifests if root has no `bin`. Read the exports for each entry point from `.sensei/symbol-map.json` (the indexer already extracted them). Write each with a `role` phrase.
 
 **Step 3d: Fill `concepts`**
 
@@ -64,7 +60,7 @@ Read files in `docs/design/` at L0. Extract domain terms not obvious from code n
 **Step 3e: Fill `patterns`**
 
 ```
-call: find_pattern("convention OR pattern OR rule")
+call: get_patterns("")
 ```
 
 Cross-reference `.sensei/symbol-map.json` for confirmed symbol names. Add patterns with exact symbol paths.
@@ -125,10 +121,10 @@ Run `sensei index` again any time. It diffs against the previous index and only 
 | Field | Primary source | Effort |
 |---|---|---|
 | `description` | README.md L1 | Low |
-| `entry_points[].role` | package.json bin + list_exports | Low |
-| `api_surface` | list_exports per entry point | Medium |
+| `entry_points[].role` | package.json bin + symbol-map.json | Low |
+| `api_surface` | symbol-map.json per entry point | Medium |
 | `concepts` | docs/design/ L0 scan | Medium |
-| `patterns` | find_pattern + symbol-map | Medium |
+| `patterns` | get_patterns + symbol-map | Medium |
 | `docs[].covers[]` | Read each doc at L1 | High |
 
 ## Common Mistakes

@@ -313,7 +313,7 @@ Skills are prompt-based enhancements that are auto-applied when their trigger co
 | `extract-docs` | Generating or updating documentation for a module — extracts exports and infers behavior from implementation |
 | `building-app-mockups` | Designing new UI pages or components — builds alternatives as real app routes, not standalone files |
 | `identify-unknown-libs` | When `get_lib_docs` returns empty sections — guides through registering missing library docs |
-| `ui-dummy-data` | Building new UI pages where the backend API may not exist yet — types-first, wires real data later |
+| `ui-state-pattern` | Building a new UI screen — Component → State → Load pattern; presentation-only components, state owns changes, load swaps mock↔real |
 
 ---
 

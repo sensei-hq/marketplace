@@ -12,7 +12,7 @@ Manages project-specific personas in `.sensei/personas/`. Each persona is a mark
 ### Step 1: Load personas
 
 1. Read all `.sensei/personas/*.md` files — if directory is empty or missing, report "No personas defined yet" and offer to create one
-2. Read `.sensei/mindsets.md` — load specialist mindsets for reference
+2. Specialist mindsets ship as subagents (`/sensei:agent`) — reference them when a domain (UX, security, performance, DevOps) applies
 
 ### Step 2: Handle action
 
@@ -43,7 +43,7 @@ Manages project-specific personas in `.sensei/personas/`. Each persona is a mark
 
 ### Step 3: Log
 
-- Call `log_event(type="command_invoked", data="{\"command\":\"persona\",\"action\":\"$ACTION\"}")` when available
+- Call `log_event(type="command_invoked", data="{\"command\":\"persona\",\"action\":\"$ARGUMENTS\"}")` — MANDATORY
 
 ## Persona file format
 

@@ -16,17 +16,58 @@ High-level architecture from a chosen approach. Defines components, their interf
    - If $ARGUMENTS names a specific analysis, look for it in `docs/analysis/`
    - If empty, list files in `docs/analysis/` and ask which to blueprint
 5. Read the analysis doc — note the chosen approach
-6. Read the blueprint template from `${CLAUDE_PLUGIN_ROOT}/templates/blueprint.md`
-7. Create a doc in `docs/blueprints/` with:
-   - Overview (2-3 sentences)
-   - Architecture diagram (ASCII or mermaid)
-   - Components with responsibilities
-   - Data flow between components
-   - Integration points with external systems
-   - Dependencies and what breaks if they're missing
-   - Implementation order (bottom-up, innermost layer first)
-8. Set frontmatter: name, description, date, status: blueprint, origin (idea doc), analysis (analysis doc)
-9. Do NOT write code. Architecture level only.
+6. Create a doc in `docs/blueprints/` with this structure:
+
+````markdown
+---
+title: <short title>
+description: <one line — what system or component this architects>
+type: blueprint
+status: blueprint
+created: <YYYY-MM-DD>
+depends_on:           # the idea + analysis docs this builds on
+  - docs/ideas/<file>.md
+  - docs/analysis/<file>.md
+related_issues: []
+references: []        # existing components, files, or libraries this integrates with
+---
+
+# <Title>
+
+## Objective
+2-3 sentences: what this component/system does, its role, and the key design decision that shapes everything.
+
+## Architecture
+Diagram of components and how they connect (ASCII or mermaid).
+
+## Components
+### <Component>
+Responsibilities, interfaces, what it owns and depends on.
+
+## Data flow
+How data moves through the system; what triggers what.
+
+## Integration points
+| Integration | Method | Notes |
+|-------------|--------|-------|
+
+## Dependencies
+| Dependency | Status | Impact if missing |
+|-----------|--------|-------------------|
+
+## Implementation order
+Bottom-up, innermost layer first (D18).
+
+## Personas
+If `.sensei/personas/*.md` define personas, consider each one here.
+| Persona | Key goal | Acceptance from their perspective |
+|---------|----------|-----------------------------------|
+
+## Out of scope
+What this blueprint does NOT cover, and where it's tracked instead.
+````
+
+7. Do NOT write code. Architecture level only.
 
 ## Nudges
 

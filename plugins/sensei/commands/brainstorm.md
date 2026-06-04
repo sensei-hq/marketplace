@@ -16,16 +16,16 @@ The primary creative command. One conversation can produce artifacts at multiple
 5. Engage in open conversation. Ask clarifying questions. Explore options.
 6. As the conversation produces artifacts, route them by depth:
 
-   | Depth signal | Target folder | Template |
-   |-------------|---------------|----------|
-   | Problem statement, concept, "what if" | `docs/ideas/` | `${CLAUDE_PLUGIN_ROOT}/templates/idea.md` |
-   | Feasibility, tradeoffs, options with pros/cons | `docs/analysis/` | `${CLAUDE_PLUGIN_ROOT}/templates/analysis.md` |
-   | Architecture, components, interfaces, data flow | `docs/blueprints/` | `${CLAUDE_PLUGIN_ROOT}/templates/blueprint.md` |
-   | Findings from trying something | `docs/experiments/` | `${CLAUDE_PLUGIN_ROOT}/templates/experiment.md` |
-   | Task breakdown, acceptance criteria | `docs/plans/` | `${CLAUDE_PLUGIN_ROOT}/templates/plan.md` |
+   | Depth signal | Target folder | Doc structure |
+   |-------------|---------------|---------------|
+   | Problem statement, concept, "what if" | `docs/ideas/` | as defined by `/sensei:idea` |
+   | Feasibility, tradeoffs, options with pros/cons | `docs/analysis/` | as defined by `/sensei:analyze` |
+   | Architecture, components, interfaces, data flow | `docs/blueprints/` | as defined by `/sensei:blueprint` |
+   | Findings from trying something | `docs/experiments/` | as defined by `/sensei:experiment` |
+   | Task breakdown, acceptance criteria | `docs/plans/` | as defined by `/sensei:plan` |
 
 7. Before writing to a folder, ask: "This is getting into [analysis/blueprint/plan] territory — should I write it to `docs/[folder]/`?"
-8. Use frontmatter `origin:` to trace lineage between docs created in the same brainstorm
+8. Use frontmatter `depends_on:` to trace lineage between docs created in the same brainstorm
 9. Call `log_event(type="phase_transition", data="{\"from\":\"brainstorm\",\"to\":\"[depth]\"}")` when routing content — MANDATORY
 
 ## Nudges

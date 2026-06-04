@@ -1,14 +1,14 @@
 ---
 name: reverse-engineering
-description: Enterprise reverse engineering workflow — generates openspec/ product docs, feature specs, and audit reports with OWASP coverage, NFR evaluation, DB schema analysis, and structured backlogs. Use via /product, /feature, or /audit commands.
+description: Use when reverse-engineering an existing codebase into documentation — generating openspec/ product docs, per-feature specs, or a security/NFR audit with OWASP Top 10 coverage, DB schema analysis, and structured backlogs. Invoked by /sensei:spec with mode=product|feature|audit.
 ---
 
 # INVOCATION CONTRACT
 
-Commands MUST follow this exact syntax:
+This skill is invoked by `/sensei:spec`, which maps its sub-actions to a `mode`. The invocation passes these parameters:
 
 ```
-/re mode=<mode> [capability=<n>] [scope_paths=<path1,path2>] [root=<path>]
+mode=<mode> [capability=<n>] [scope_paths=<path1,path2>] [root=<path>]
 ```
 
 **Parameters:**
@@ -17,15 +17,15 @@ Commands MUST follow this exact syntax:
 - `scope_paths` — Optional. Comma-separated paths. If omitted, resolved from `features.md` or per-stack fallback rules.
 - `root` — Optional. Root directory. Defaults to `.`
 
-**Examples:**
+**Examples** (parameters as passed by `/sensei:spec`):
 ```
-/re mode=product
-/re mode=product root=./apps/backend
-/re mode=feature capability=auth
-/re mode=feature capability=payments scope_paths=src/payments,src/api/billing
-/re mode=feature
-/re mode=audit capability=auth
-/re mode=audit
+mode=product
+mode=product root=./apps/backend
+mode=feature capability=auth
+mode=feature capability=payments scope_paths=src/payments,src/api/billing
+mode=feature
+mode=audit capability=auth
+mode=audit
 ```
 
 **Validation Rules:**
@@ -716,7 +716,7 @@ Select feature(s) to reverse engineer (e.g. 1 or 1,3 or all):
 If no incomplete features → print:
 ```
 ✅ All features already have specs.
-Use /re mode=audit to check for drift.
+Use /sensei:spec audit to check for drift.
 ```
 Then STOP.
 

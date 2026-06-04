@@ -14,28 +14,27 @@ Systematic test coverage from existing code patterns. Finds untested functions, 
 ### Step 1 — Find the test pattern
 ```
 call: search("describe it expect")
-call: get_bearings("<module to test>")
 ```
-Read one existing spec file to establish: import style, mock strategy, assertion patterns, file naming convention (`*.spec.ts` vs `*.test.ts`).
+Locate existing spec files, then `Read` one to establish: import style, mock strategy, assertion patterns, file naming convention (`*.spec.ts` vs `*.test.ts`).
 
 ### Step 2 — Identify coverage gaps
 
 For each function in scope:
 ```
-call: get_symbol("<function name>", depth=0)
-call: search_code_graph("<function name>.spec")
+call: search("<function name>")
+call: get_callers("<function name>")
 ```
-If no spec file references the function — it's untested.
+Then `search("<function name> spec")` (or grep for a spec referencing it). If no spec references the function — it's untested.
 
 Priority order:
 1. Public exports with no tests
-2. Functions with complexity > 5 (more branching = more tests needed)
-3. Functions on critical paths (many callers)
+2. Functions with many callers (high blast radius — from `get_callers`)
+3. Functions with heavy branching (more branches = more tests needed)
 
 ### Step 3 — Generate tests
 
 For each untested function:
-1. Load implementation: `load_context("<file path>")`
+1. `Read` the implementation file
 2. Identify: happy path, edge cases, error conditions
 3. Write tests following the existing pattern:
    - One `describe` block per function
@@ -48,7 +47,7 @@ Run the test suite after each test file. Fix failures before moving to the next 
 
 ### Step 5 — Checkpoint
 ```
-call: checkpoint(task_summary="Added tests for <N> functions in <module>")
+call: log_event(type="checkpoint", data="{\"summary\":\"Added tests for <N> functions in <module>\"}")
 ```
 
 ## Test Quality Rules
