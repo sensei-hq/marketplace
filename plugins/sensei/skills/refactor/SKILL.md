@@ -7,26 +7,28 @@ description: Use when improving code structure without changing behaviour — fi
 
 ## Overview
 
-Structured approach to safe, targeted refactoring. Starts from complexity data, not intuition. Each change is scoped to the minimal blast radius.
+Structured approach to safe, targeted refactoring. Starts from the code graph, not intuition. Each change is scoped to the minimal blast radius.
 
 ## Procedure
 
 ### Step 1 — Identify targets
 ```
-call: get_complexity(limit=10, min_complexity=8)
+call: get_duplicates()
+call: get_communities()
 ```
-Pick the highest-value targets: high complexity + high call frequency.
-
-For each candidate:
+Pick the highest-value targets: duplicated logic and tightly-coupled clusters. For each candidate, map the blast radius:
 ```
-call: get_symbol("<function name>", depth=2)
+call: search("<function name>")
+call: get_callers("<function name>")
+call: get_callees("<function name>")
 ```
-Map who calls it and what it calls — this defines the blast radius.
+Who calls it and what it calls defines how far a change reaches.
 
 ### Step 2 — Load context
 ```
-call: context_pack(task="refactor <function name> in <file>")
+call: get_layered_context()
 ```
+Then `Read` the target file(s) so you refactor against the real implementation, not a summary.
 
 ### Step 3 — Apply refactor
 
@@ -36,8 +38,8 @@ Refactor types and their rules:
 |---|---|
 | **Extract function** | If a block has a clear single responsibility and is > 10 lines |
 | **Reduce parameters** | If a function takes > 4 params, group related ones into an object |
-| **Flatten nesting** | If complexity > 8, use early returns to reduce nesting depth |
-| **Remove duplication** | Only extract if used in 3+ places |
+| **Flatten nesting** | If nesting is deep, use early returns to reduce branching |
+| **Remove duplication** | Only extract if used in 3+ places (confirm with `get_duplicates`) |
 | **Rename for clarity** | If the name doesn't match what the function does |
 
 **Do NOT:**
@@ -48,17 +50,19 @@ Refactor types and their rules:
 ### Step 4 — Verify
 
 After each refactor:
-1. Run tests (zero failures required)
-2. Re-check callers: `get_symbol("<refactored fn>", depth=1)`
-3. Confirm complexity dropped: `get_complexity(min_complexity=1)`
+1. Run the project's test command (zero failures required)
+2. Re-walk callers: `get_callers("<refactored fn>")` — confirm nothing downstream broke
+3. Confirm the blast radius shrank — duplication gone (`get_duplicates`), coupling reduced
 
-### Step 5 — Record and snapshot
+### Step 5 — Record and checkpoint
 ```
-call: record_memory({ type: "pattern", title: "Refactor: <what changed>", content: "<approach used>" })
-call: take_snapshot("Refactored <N> functions in <module>")
+call: propose_memory(scope="project", type="pattern", title="Refactor: <what changed>", content="<approach used>", triage_signal="repeat_pattern")
+call: log_event(type="checkpoint", data="{\"summary\":\"Refactored <N> functions in <module>\"}")
 ```
 
 ## Complexity Thresholds
+
+Assess branching by reading the function (cyclomatic complexity isn't a callable tool — it's the desktop graph overlay). Use these thresholds as judgment:
 
 | Score | Action |
 |---|---|
@@ -71,7 +75,7 @@ call: take_snapshot("Refactored <N> functions in <module>")
 
 | Anti-pattern | Fix |
 |---|---|
-| Refactoring by intuition | Start from `get_complexity` data |
+| Refactoring by intuition | Start from `get_duplicates` / `get_communities` + the call graph |
 | Refactoring without tests | Add tests first, then refactor |
 | Big-bang refactor (whole module at once) | One function at a time, verify after each |
 | Changing behaviour during refactor | Separate PR for behaviour changes |

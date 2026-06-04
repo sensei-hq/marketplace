@@ -1,7 +1,6 @@
 ---
 name: tauri-playwright-testing
 description: Use when writing or debugging E2E tests for a Tauri desktop app with Playwright. Covers globalSetup, build flags, navigation, TauriPage API caveats, and test-mode configuration — generic across any Tauri + SvelteKit or Tauri + web-frontend stack.
-tags: ["tauri", "playwright", "testing", "guidelines", "tips", "e2e"]
 ---
 
 # Tauri Playwright Testing

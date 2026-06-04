@@ -5,10 +5,11 @@ argument-hint: Optional commit message
 
 ## Step 1: Zero-errors checkpoint
 
-Run the full check:
-```bash
-bun run --filter '*' test && bunx tsc --noEmit
-```
+Detect and run the project's full test + lint/type-check commands — do not assume a toolchain:
+- Rust → `cargo test` + `cargo clippy`
+- JS/TS → the package-manager script (`<pm> test`) + type-check (`tsc --noEmit`, e.g. `bunx tsc --noEmit`)
+- Python → `pytest` + `ruff check`; Go → `go test ./...` + `go vet ./...`
+- Prefer a project wrapper if one exists (`make test`, a root `test` script).
 
 If any errors: **stop**. Do not commit. Fix all errors first, then run again.
 

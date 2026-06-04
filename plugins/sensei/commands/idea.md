@@ -17,10 +17,38 @@ Structured ideation. The AI asks questions to understand the problem before prop
    - What problem does this solve?
    - Who is affected?
    - What constraints exist?
-6. Read the idea template from `${CLAUDE_PLUGIN_ROOT}/templates/idea.md`
-7. Create a doc in `docs/ideas/` following the template. Use a descriptive filename (kebab-case).
-8. Set frontmatter: name, description, date (today), status: idea, origin
-9. Do NOT write code. Do NOT propose solutions. Stay in the problem space.
+6. Create a doc in `docs/ideas/` (descriptive kebab-case filename) with this structure:
+
+````markdown
+---
+title: <short title>
+description: <one line — the problem or concept this explores>
+type: idea
+status: idea
+created: <YYYY-MM-DD>
+depends_on: []        # paths to docs this builds on (usually none for a fresh idea)
+related_issues: []    # GitHub issue numbers, once they exist
+references: []        # code symbols, files, or libraries this concerns
+---
+
+# <Title>
+
+## Objective
+What pain point or opportunity this addresses, who is affected, and what happens if we do nothing.
+
+## Current state
+What exists today — what works, what's broken or missing.
+
+## What this covers
+- <area> — <one line, concept level, no implementation>
+
+## Open questions
+| # | Question |
+|---|----------|
+| 1 | <question> |
+````
+
+7. Do NOT write code. Do NOT propose solutions. Stay in the problem space.
 
 ## Nudges
 

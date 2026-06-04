@@ -4,22 +4,11 @@ set -euo pipefail
 source "$(dirname "$0")/_lib.sh"
 
 PROJECT_ROOT="${CLAUDE_PROJECT_ROOT:-${PWD}}"
-PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 
 # Forward telemetry first so the event reaches the daemon even if the
 # context-building below fails.
 read_stdin_payload
 send_telemetry "$PAYLOAD"
-
-escape_for_json() {
-  local s="$1"
-  s="${s//\\/\\\\}"
-  s="${s//\"/\\\"}"
-  s="${s//$'\n'/\\n}"
-  s="${s//$'\r'/\\r}"
-  s="${s//$'\t'/\\t}"
-  printf '%s' "$s"
-}
 
 # ── Read rules ──────────────────────────────────────────────────────────
 RULES_FILE="${PROJECT_ROOT}/.sensei/rules.md"
@@ -28,12 +17,8 @@ if [ -f "$RULES_FILE" ]; then
   RULES=$(head -60 "$RULES_FILE")
 fi
 
-# ── Read mindsets ────────────────────────────────────────────────────────────
-MINDSETS_FILE="${PLUGIN_ROOT}/templates/mindsets.md"
-MINDSETS_SUMMARY=""
-if [ -f "$MINDSETS_FILE" ]; then
-  MINDSETS_SUMMARY="Mindsets loaded: analyst, developer, acceptance tester (see /sensei:rules for details)"
-fi
+# ── Mindsets (shipped as subagents) ──────────────────────────────────────────
+MINDSETS_SUMMARY="Core three in sequence: Analyst → Developer → Acceptance Tester; specialists by domain. Each is a subagent — invoke via /sensei:agent."
 
 # ── Read workflow state ──────────────────────────────────────────────────────
 STATE_FILE="${PROJECT_ROOT}/.sensei/state.yaml"

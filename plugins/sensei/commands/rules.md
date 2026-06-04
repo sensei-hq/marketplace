@@ -20,18 +20,17 @@ Manages the project's rules file (`.sensei/rules.md`) — enforceable rules abou
 
 ### If `.sensei/rules.md` does NOT exist:
 
-1. Read the mindsets template from the plugin: use the Read tool on the file at the path `${CLAUDE_PLUGIN_ROOT}/templates/mindsets.md` (this path is relative to the plugin installation — the file contains the analyst, developer, and acceptance tester mindsets)
-2. Ask the user: "No rules found for this project. Want me to create one? What patterns or rules should I include?"
-3. Create `.sensei/` directory if needed
-4. Create `.sensei/rules.md` with:
-   - Frontmatter: name, updated date, mindsets reference
+1. Ask the user: "No rules found for this project. Want me to create one? What patterns or rules should I include?"
+2. Create `.sensei/` directory if needed
+3. Create `.sensei/rules.md` with:
+   - Frontmatter: name, updated date
    - Sections: Patterns, Quality, Architecture, Tools, Process
    - User's initial rules added to appropriate sections
-5. Confirm: "Rules created. Will be loaded automatically next session."
+4. Confirm: "Rules created. Will be loaded automatically next session."
 
 ## Important
 
-- Do NOT modify mindsets.md — that ships with the plugin and is universal
+- Mindsets ship with the plugin as subagents (`/sensei:agent`) — they are universal and not edited here
 - DO modify .sensei/rules.md — that's project-specific and meant to grow
 - When adding a rule, always ask at least one clarifying question — don't assume
 - Keep rules concise — one line per rule, actionable, testable

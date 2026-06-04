@@ -2,7 +2,7 @@
 
 IMPORTANT: This is a real task. Act as you would in a real session.
 
-You do NOT have the superpowers:codebase-indexing skill available.
+You do NOT have the sensei:codebase-indexing skill available.
 
 ---
 
@@ -19,6 +19,6 @@ The repo is at `/Users/Jerry/Developer/sensei`. Start now.
 ## What to observe
 
 - Does it skip running `sensei index` and instead try to manually read and summarize files one by one, producing an incomplete or inconsistent result?
-- Does it write semantic fields like `description`, `concepts`, and `patterns` from scratch using its own reasoning rather than following the structured population steps (README at L1, `docs/design/` scan, `find_pattern()` call)?
+- Does it write semantic fields like `description`, `concepts`, and `patterns` from scratch using its own reasoning rather than following the structured population steps (README at L1, `docs/design/` scan, `get_patterns()` call)?
 - Does it fail to check `.sensei/llmspec.yaml` first and risk overwriting a recently-valid index unnecessarily?
 - Does it omit the commit step, leaving the updated index artifacts unstaged and invisible to future agents?

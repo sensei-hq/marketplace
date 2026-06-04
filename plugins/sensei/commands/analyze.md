@@ -20,14 +20,48 @@ Feasibility assessment. Reads prior idea docs, scans the codebase for related pa
    - `search()` for related symbols and patterns
    - `get_patterns()` for structural patterns in the codebase
    - `get_project_summary()` for project context
-7. Read the analysis template from `${CLAUDE_PLUGIN_ROOT}/templates/analysis.md`
-8. Create a doc in `docs/analysis/` with:
-   - Current state of related code
-   - Feasibility assessment
-   - 2-3 approaches with pros, cons, and effort for each
-   - A recommendation with rationale
-9. Set frontmatter: name, description, date, status: analysis-complete, origin (path to idea doc)
-10. Present the options to the user — do NOT pick silently
+7. Create a doc in `docs/analysis/` with this structure:
+
+````markdown
+---
+title: <short title>
+description: <one line — what is being assessed and why>
+type: analysis
+status: analysis-complete
+created: <YYYY-MM-DD>
+depends_on:           # the idea doc(s) this assesses
+  - docs/ideas/<file>.md
+related_issues: []
+references: []        # code symbols, files, or libraries the analysis touches
+---
+
+# <Title>
+
+## Objective
+The question this analysis answers and the decision it informs.
+
+## Current state
+What exists in the codebase today — relevant patterns, components, gaps. Reference specific files and symbols.
+
+## Feasibility
+Can this be done with the current architecture? Technical risks and effort.
+
+## Approaches
+### Option A: <name>
+- Pros:
+- Cons:
+- Effort:
+
+### Option B: <name>
+- Pros:
+- Cons:
+- Effort:
+
+## Recommendation
+Which option and why; what was traded off.
+````
+
+8. Present the options to the user — do NOT pick silently
 
 ## Nudges
 

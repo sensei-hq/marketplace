@@ -57,3 +57,16 @@ send_telemetry() {
 
   return 0
 }
+
+# Escape a string for embedding inside a JSON string value — for hooks that
+# build their own output without jq. Handles backslash, double-quote, and the
+# common control characters (newline, carriage return, tab).
+escape_for_json() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  s="${s//$'\n'/\\n}"
+  s="${s//$'\r'/\\r}"
+  s="${s//$'\t'/\\t}"
+  printf '%s' "$s"
+}

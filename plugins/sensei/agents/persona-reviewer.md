@@ -1,6 +1,25 @@
 ---
 name: sensei-persona-reviewer
-description: Review work from a specific persona's perspective, or all personas if none specified. Use proactively after implementation to validate that the work serves each persona's goals and meets their validation criteria.
+description: |
+  Review work from a specific persona's perspective, or all personas if none specified. Use proactively after implementation to validate that the work serves each persona's goals and meets their validation criteria.
+
+  <example>
+  Context: A feature just landed and the user wants to know if it serves the project's defined users.
+  user: "I shipped the bulk-export feature. Does it actually help our personas?"
+  assistant: "Let me run the sensei-persona-reviewer agent to load the project's personas and check whether this serves each one's goals and validation criteria."
+  <commentary>
+  The user wants post-implementation validation against the project's defined personas — the persona-reviewer loads .sensei/personas and checks each one's criteria.
+  </commentary>
+  </example>
+
+  <example>
+  Context: The user is concerned a change helps one user type at another's expense.
+  user: "Review the new advanced-filters panel for the power-user persona specifically."
+  assistant: "I'll launch the sensei-persona-reviewer agent focused on the power-user persona, then surface any conflicts with other personas' needs."
+  <commentary>
+  A request to review work from a named persona's perspective is exactly what this agent does — and it also surfaces cross-persona conflicts.
+  </commentary>
+  </example>
 tools: Read, Grep, Glob
 model: sonnet
 color: pink
@@ -9,6 +28,8 @@ color: pink
 ## Purpose
 
 A generic agent that loads any persona from `.sensei/personas/` and validates work from their perspective. Unlike the mindset agents which have fixed questions, this agent adapts to whatever personas the project defines.
+
+You run in an isolated context with no conversation history — your final message is the entire return value, so put the full persona review there.
 
 ## Procedure (how)
 

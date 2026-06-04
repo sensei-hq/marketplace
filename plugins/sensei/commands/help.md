@@ -60,8 +60,8 @@ Typical flow: `idea → analyze → blueprint → plan → build → validate`
 | `/sensei:patterns` | Show detected patterns, project conventions, and match patterns for a task |
 | `/sensei:checkpoint` | Snapshot current progress for interruption recovery |
 | `/sensei:commit` | Run zero-errors checks then commit |
-| `/sensei:mockup` | Start a UI mockup — enforces framework constraints and dummy-data patterns |
-| `/sensei:docs` | Generate or update documentation — extract from code into structured docs |
+| `/sensei:mockup` | Start a UI mockup — framework-native build at real app routes (commits dirty work first) |
+| `/sensei:docs` | Fetch library documentation before writing code that uses it |
 | `/sensei:help` | Show this help |
 
 ### `/sensei:session` sub-actions
@@ -102,11 +102,17 @@ These activate automatically — you don't invoke them manually.
 
 | Skill | Triggers when... |
 |-------|-----------------|
-| `codebase-indexing` | First working on a repo or after a major refactor |
-| `analyze` | Deep architecture analysis is needed |
-| `reverse-engineering` | Reverse-engineering an unfamiliar codebase |
-| `test-gen` | Adding test coverage to untested code |
+| `codebase-indexing` | First working on a repo, after a major refactor, or when `llmspec.yaml` has placeholders |
+| `analyze` | Starting on an unfamiliar repo or after significant changes — structured health check |
+| `reverse-engineering` | Reverse-engineering a codebase into product/feature/audit docs (via `/sensei:spec`) |
+| `test-gen` | Adding test coverage to untested or under-tested code |
 | `refactor` | Improving code structure without changing behaviour |
-| `extract-docs` | Generating docs from code |
-| `building-app-mockups` | Building interactive UI mockups |
-| `identify-unknown-libs` | Library docs are missing from the index |
+| `extract-docs` | Generating or updating documentation for a module from its code |
+| `building-app-mockups` | Designing new UI pages as real app routes (not standalone files) |
+| `ui-state-pattern` | Building a new UI screen — Component → State → Load, swap mock↔real |
+| `semantic-styles` | Building any UI — consistent type scale, spacing, and semantic color |
+| `semantic-styles-rokkit` | Building or auditing a Rokkit-powered app — token pipeline, dark mode |
+| `tauri-screen-dev` | Building a new screen/stage in the Tauri + SvelteKit desktop app |
+| `tauri-playwright-testing` | Writing or debugging Playwright E2E tests for the Tauri app |
+| `identify-unknown-libs` | `get_lib_docs` returns empty sections — register missing library docs |
+| `knowledge-capture` | Session start (load memory) and when a capture trigger fires (correction / revert / "actually") |

@@ -9,7 +9,7 @@ Before building anything:
 2. If dirty — commit it first. No exceptions.
 3. Confirm the target framework (SvelteKit, React, Next.js, etc.)
 
-Then invoke the `working-smarter` skill to guide the mockup build:
+Then invoke the `building-app-mockups` skill to guide the mockup build:
 - Build at a real route in the app (e.g. `/mockups/a`, `/mockups/b`)
 - Use the project's actual components, tokens, and layout primitives
 - Never create a standalone HTML file

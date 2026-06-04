@@ -2,7 +2,7 @@
 
 IMPORTANT: This is a real task. Act as you would in a real session.
 
-You have the superpowers:identify-unknown-libs skill available.
+You have the sensei:identify-unknown-libs skill available.
 
 ---
 

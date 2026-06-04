@@ -9,9 +9,8 @@ Checks code quality across multiple dimensions. Auto-triggered after `/sensei:bu
 
 ## Procedure
 
-1. Call `update_phase(phase="review")` — MANDATORY (only if not already in a review triggered by /sensei:build)
-2. Call `log_event(type="command_invoked", data="{\"command\":\"review\"}")` — MANDATORY
-3. Read `.sensei/rules.md` — rules inform what to check
+1. Call `log_event(type="command_invoked", data="{\"command\":\"review\"}")` — MANDATORY. Review is cross-cutting — do NOT change the workflow phase; it runs within the current phase (typically build or validate).
+2. Read `.sensei/rules.md` — rules inform what to check
 
 ### Check 1: Pattern conformance
 
@@ -47,11 +46,11 @@ Checks code quality across multiple dimensions. Auto-triggered after `/sensei:bu
 
 ### Check 6: Persona validation
 
-1. Read `.sensei/personas.yaml` — if it exists and has personas defined:
+1. Read `.sensei/personas/*.md` — if any exist:
 2. For each persona (or just the active one if set):
    - Evaluate modified code/features against the persona's `validates` criteria
    - Flag any criterion that isn't met
-3. If no personas file exists, skip this check
+3. If no personas are defined, skip this check
 
 ### Report
 

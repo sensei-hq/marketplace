@@ -1,6 +1,6 @@
 ---
 name: semantic-styles
-description: Use when building any UI — establishes how to write styles that feel consistent and professional across the entire application rather than per-component. Covers type scale, spacing system, semantic color, border-radius, and how to avoid the "every screen slightly different" problem.
+description: Use when building any UI — establishes how to write styles that feel consistent and professional across the entire application rather than per-component. Covers type scale, spacing system, semantic color, border-radius, and how to avoid the "every screen slightly different" problem. For Rokkit-powered apps, use semantic-styles-rokkit instead.
 ---
 
 # Semantic Styles

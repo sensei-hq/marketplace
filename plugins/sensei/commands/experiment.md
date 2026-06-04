@@ -15,14 +15,45 @@ Test an assumption by building a minimal prototype. Code is structured for poten
 4. If $ARGUMENTS is empty, ask: "What assumption do you want to test?"
 5. Create a git branch for the experiment: `git checkout -b experiment/<name>`
 6. Build the minimal prototype — just enough to test the hypothesis
-7. Read the experiment template from `${CLAUDE_PLUGIN_ROOT}/templates/experiment.md`
-8. Create a doc in `docs/experiments/` with:
-   - Hypothesis: what are we testing?
-   - Approach: what did we build?
-   - Findings: what worked, what didn't, surprises
-   - Recommendation: incorporate, modify, discard, or extend
-   - Artifacts: what to keep vs discard
-9. Set frontmatter: name, description, date, status: experiment, origin, branch
+7. Create a doc in `docs/experiments/` with this structure:
+
+````markdown
+---
+title: <short title>
+description: <one line — what assumption or approach is being tested>
+type: experiment
+status: experiment
+created: <YYYY-MM-DD>
+branch: <git branch, if any>
+depends_on: []        # the idea or blueprint that motivated this
+related_issues: []
+references: []        # code, files, or libraries the experiment exercises
+---
+
+# <Title>
+
+## Objective
+The hypothesis: what we believe, what we're testing, what success looks like.
+
+## Approach
+What we built — minimal, just enough to test the hypothesis.
+
+## Constraints
+Time box, scope limits, what we're NOT trying to prove.
+
+## Findings
+What worked, what didn't, and any surprises.
+
+## Recommendation
+- [ ] Incorporate — viable, proceed
+- [ ] Modify — partially viable (what to change)
+- [ ] Discard — not viable (why)
+- [ ] Extend — needs more testing (what's unknown)
+
+## Artifacts
+| Artifact | Location | Keep? |
+|----------|----------|-------|
+````
 
 ## Nudges
 
