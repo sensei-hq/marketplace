@@ -1,3 +1,12 @@
+---
+organization: Sensei HQ
+project: sensei
+role: marketplace
+tagline: Sensei plugin for Claude Code
+summary: Slash commands, specialist agents, auto-applied skills, and lifecycle hooks that keep the AI assistant grounded in your codebase's patterns and session state.
+stack: [markdown, json]
+---
+
 # sensei
 
 The sensei plugin for Claude Code provides a structured development workflow through 20 slash commands, 8 specialist agents, 9 auto-applied skills, and 5 lifecycle hooks. It keeps Claude grounded in your codebase's actual patterns, tracks session state across interruptions, and guides work through a deliberate idea-to-validated-feature lifecycle.

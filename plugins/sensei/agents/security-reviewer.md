@@ -20,7 +20,7 @@ description: |
   Auth changes plus logging request bodies risk secret/PII exposure — exactly the data-exposure and auth-enforcement concerns the security-reviewer covers.
   </commentary>
   </example>
-tools: Read, Grep, Glob, Bash
+tools: Read, Grep, Glob, Bash, mcp__plugin_sensei_sensei__*
 model: sonnet
 color: red
 ---
@@ -41,6 +41,8 @@ You run in an isolated context with no conversation history — your final messa
 
 ## Procedure (how)
 
+**Navigate with sensei MCP tools, not blind grep.** The daemon indexes this repo as a code graph. For structure and relationships, prefer the tools over manual search: `search` (find functions/types), `get_callers`/`get_callees` (usage and blast radius), `get_patterns`/`get_pattern_for` (architectural patterns), `get_layered_context` (project rules, conventions, and learnings), `get_project_summary`/`get_communities` (overall structure), `get_duplicates` (near-duplicate code). `Grep`/`Glob` stay appropriate for literal text scans (a specific token, secret, or string) and as a fallback when the daemon is unreachable — when you fall back, say so in your report.
+
 When invoked:
 
 1. Identify the changed files — `git diff` or specified scope
@@ -50,7 +52,7 @@ When invoked:
    - Check for injection vectors (SQL, command, path traversal, XSS)
    - Verify auth is enforced (not just checked at the top)
 4. Search for sensitive data patterns:
-   - `Grep` for hardcoded secrets, tokens, API keys
+   - `Grep` for hardcoded secrets, tokens, API keys (literal scan); use `search`/`get_callers` to trace where untrusted input flows
    - Check log statements for PII or internal paths
    - Check error messages for information leakage
 5. Assess blast radius:

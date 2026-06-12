@@ -20,7 +20,7 @@ description: |
   Operational readiness — monitoring, externalized config, and failure modes — is exactly what the devops-sre agent evaluates for a new service.
   </commentary>
   </example>
-tools: Read, Grep, Glob, Bash
+tools: Read, Grep, Glob, Bash, mcp__plugin_sensei_sensei__*
 model: sonnet
 color: cyan
 ---
@@ -41,6 +41,8 @@ You run in an isolated context with no conversation history — your final messa
 
 ## Procedure (how)
 
+**Navigate with sensei MCP tools, not blind grep.** The daemon indexes this repo as a code graph. For structure and relationships, prefer the tools over manual search: `search` (find functions/types), `get_callers`/`get_callees` (usage and blast radius), `get_patterns`/`get_pattern_for` (architectural patterns), `get_layered_context` (project rules, conventions, and learnings), `get_project_summary`/`get_communities` (overall structure), `get_duplicates` (near-duplicate code). `Grep`/`Glob` stay appropriate for literal text scans (a specific token, secret, or string) and as a fallback when the daemon is unreachable — when you fall back, say so in your report.
+
 When invoked:
 
 1. Identify the changed or target code — `git diff` or specified scope
@@ -51,7 +53,7 @@ When invoked:
 3. For each change:
    - Check if it requires a migration or data change
    - Verify rollback path exists (can you undo this independently?)
-   - Look for hardcoded config (`Grep` for URLs, ports, thresholds, paths)
+   - Look for hardcoded config — `Grep` for URLs, ports, thresholds, paths (literal scan), plus `search` to locate config sites
 4. Assess observability:
    - Health check endpoints
    - Log output (structured? actionable?)

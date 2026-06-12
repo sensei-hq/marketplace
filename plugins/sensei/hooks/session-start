@@ -42,6 +42,20 @@ else
 No rules file found. Run /sensei:rules to create one."
 fi
 
+# ── Global rules (governance plane, materialized by the daemon) ──────────────
+# ~/.sensei/rules.md holds always-on user/general rules resolved + rendered by
+# the daemon. Repository-specific rules (org/project/technology) resolve live —
+# the agent calls the get_rules MCP tool.
+GLOBAL_RULES_FILE="${HOME}/.sensei/rules.md"
+GLOBAL_RULES_SECTION=""
+if [ -f "$GLOBAL_RULES_FILE" ]; then
+  GLOBAL_RULES_SECTION="## Global Rules (always-on)
+
+$(sed -e '/^<!--/,/-->/d' "$GLOBAL_RULES_FILE" | head -80)
+
+Repository-specific rules resolve live — call the \`get_rules\` MCP tool."
+fi
+
 # ── Mindsets (shipped as subagents — lean reminder only) ─────────────────────
 # Mindsets are agents (plugin agents/). Inject a lean pointer, not the full
 # question set — the detail lives in each agent and loads on demand.
@@ -89,6 +103,8 @@ Daemon: ${DAEMON_STATUS}
 
 ${STATE_SECTION}
 
+${GLOBAL_RULES_SECTION}
+
 ${RULES_SECTION}
 
 ${MINDSETS_SECTION}
@@ -97,19 +113,21 @@ ${PERSONAS_SECTION}
 
 ## Sensei MCP Tools (REQUIRED)
 
-You MUST use sensei MCP tools instead of grep/glob for code navigation. These tools use the indexed code graph and return richer results. If MCP tools fail, fall back to grep/glob and report the failure.
+You MUST use sensei MCP tools instead of grep/glob for code navigation — they use the indexed code graph and return richer results. If a tool errors or returns empty, fall back to grep/glob and report it.
 
-**Before implementing any change**, call:
-- \`get_patterns(pattern)\` — check existing patterns FIRST. Do not implement without checking.
-- \`get_project_summary()\` — understand the codebase structure
+**Before implementing any change, call (in order):**
+- \`get_rules()\` — governance rules for this repo (mandatory rules are non-negotiable). Check FIRST.
+- \`get_patterns(pattern)\` — existing architectural patterns (hook, middleware, route, component, adapter). Don't implement without checking.
+- \`get_project_conventions()\` — naming/structure conventions + outliers; match the house style.
+- \`get_project_summary()\` — codebase structure, libs, stack.
 
-**Code Intelligence (use instead of grep/glob):**
-- \`search(query, project?)\` — Find functions and types (replaces grep for symbol search)
-- \`get_callers(name)\` — Who calls this function? (replaces manual tracing)
-- \`get_callees(name)\` — What does this function call?
-- \`get_patterns(pattern)\` — Find architectural patterns: hook, middleware, route, component, adapter
-- \`get_communities()\` — Code architecture clusters
-- \`get_project_summary()\` — Stats, libs, stack
+**Find code (use instead of grep/glob — populated and reliable):**
+- \`search(query, project?)\` — find functions/types by name or concept (replaces grep for symbol search).
+- \`get_duplicates(min_similarity?)\` — near-duplicate functions; reuse before adding.
+- \`get_communities()\` — code architecture clusters.
+
+**Call navigation (currently limited):**
+- \`get_callers(name)\` / \`get_callees(name)\` — caller/callee tracing. NOTE: call-graph edges aren't fully populated yet (issue #57), so these can return empty — if so, fall back to \`search\` + grep rather than concluding there are no callers.
 
 **Library Documentation:**
 - \`get_lib_docs(name)\` — Library overview (e.g. rokkit, kavach)
