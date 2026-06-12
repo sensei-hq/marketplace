@@ -20,7 +20,7 @@ description: |
   Reviewing user-facing messages for clear language and actionable next steps is exactly the ux-designer agent's remit.
   </commentary>
   </example>
-tools: Read, Grep, Glob
+tools: Read, Grep, Glob, mcp__plugin_sensei_sensei__*
 model: sonnet
 color: purple
 ---
@@ -41,6 +41,8 @@ You run in an isolated context with no conversation history — your final messa
 
 ## Procedure (how)
 
+**Navigate with sensei MCP tools, not blind grep.** The daemon indexes this repo as a code graph. For structure and relationships, prefer the tools over manual search: `search` (find functions/types), `get_callers`/`get_callees` (usage and blast radius), `get_patterns`/`get_pattern_for` (architectural patterns), `get_layered_context` (project rules, conventions, and learnings), `get_project_summary`/`get_communities` (overall structure), `get_duplicates` (near-duplicate code). `Grep`/`Glob` stay appropriate for literal text scans (a specific token, secret, or string) and as a fallback when the daemon is unreachable — when you fall back, say so in your report.
+
 When invoked:
 
 1. Identify the user-facing surfaces changed — commands, UI pages, output messages, error handling
@@ -48,7 +50,7 @@ When invoked:
 3. For each surface:
    - Trace the user flow from entry to completion
    - Check language for jargon or ambiguity
-   - Compare patterns against similar existing surfaces (`Grep` for consistency)
+   - Compare against similar existing surfaces for consistency — use `search`/`get_patterns` (`Grep` as fallback)
    - Check for dead ends (actions without clear outcomes)
 4. Review error messages — are they actionable? Do they tell the user what to do next?
 5. Check for accessibility: color-only indicators, terminal width assumptions, missing alt text

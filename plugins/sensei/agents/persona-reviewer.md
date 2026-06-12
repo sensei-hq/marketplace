@@ -20,7 +20,7 @@ description: |
   A request to review work from a named persona's perspective is exactly what this agent does — and it also surfaces cross-persona conflicts.
   </commentary>
   </example>
-tools: Read, Grep, Glob
+tools: Read, Grep, Glob, mcp__plugin_sensei_sensei__*
 model: sonnet
 color: pink
 ---
@@ -32,6 +32,8 @@ A generic agent that loads any persona from `.sensei/personas/` and validates wo
 You run in an isolated context with no conversation history — your final message is the entire return value, so put the full persona review there.
 
 ## Procedure (how)
+
+**Navigate with sensei MCP tools, not blind grep.** The daemon indexes this repo as a code graph. For structure and relationships, prefer the tools over manual search: `search` (find functions/types), `get_callers`/`get_callees` (usage and blast radius), `get_patterns`/`get_pattern_for` (architectural patterns), `get_layered_context` (project rules, conventions, and learnings), `get_project_summary`/`get_communities` (overall structure), `get_duplicates` (near-duplicate code). `Grep`/`Glob` stay appropriate for literal text scans (a specific token, secret, or string) and as a fallback when the daemon is unreachable — when you fall back, say so in your report.
 
 When invoked:
 

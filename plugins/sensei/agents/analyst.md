@@ -20,7 +20,7 @@ description: |
   A one-line issue with no observable acceptance criteria needs the analyst to surface ambiguities and define scope rather than guessing at intent.
   </commentary>
   </example>
-tools: Read, Grep, Glob
+tools: Read, Grep, Glob, mcp__plugin_sensei_sensei__*
 model: sonnet
 color: blue
 ---
@@ -44,12 +44,14 @@ You run in an isolated context with no conversation history — your final messa
 
 ## Procedure (how)
 
+**Navigate with sensei MCP tools, not blind grep.** The daemon indexes this repo as a code graph. For structure and relationships, prefer the tools over manual search: `search` (find functions/types), `get_callers`/`get_callees` (usage and blast radius), `get_patterns`/`get_pattern_for` (architectural patterns), `get_layered_context` (project rules, conventions, and learnings), `get_project_summary`/`get_communities` (overall structure), `get_duplicates` (near-duplicate code). `Grep`/`Glob` stay appropriate for literal text scans (a specific token, secret, or string) and as a fallback when the daemon is unreachable — when you fall back, say so in your report.
+
 When invoked:
 
 1. Read the task description or issue being analyzed
 2. Read `.sensei/rules.md` for project constraints and patterns
 3. Read `.sensei/personas/*.md` to understand who benefits
-4. Search the codebase for related code (`Grep`, `Glob`) to understand current state
+4. Map related code with `search`, `get_callers`/`get_callees`, and `get_patterns` to understand current state (`Grep`/`Glob` only as a fallback)
 5. For each question above, investigate and answer concretely:
    - Cite specific files, functions, or constraints found
    - Flag ambiguities that need user input
