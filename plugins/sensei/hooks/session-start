@@ -123,11 +123,9 @@ You MUST use sensei MCP tools instead of grep/glob for code navigation — they 
 
 **Find code (use instead of grep/glob — populated and reliable):**
 - \`search(query, project?)\` — find functions/types by name or concept (replaces grep for symbol search).
+- \`get_callers(name)\` / \`get_callees(name)\` — caller/callee tracing over the indexed call graph.
 - \`get_duplicates(min_similarity?)\` — near-duplicate functions; reuse before adding.
 - \`get_communities()\` — code architecture clusters.
-
-**Call navigation (currently limited):**
-- \`get_callers(name)\` / \`get_callees(name)\` — caller/callee tracing. NOTE: call-graph edges aren't fully populated yet (issue #57), so these can return empty — if so, fall back to \`search\` + grep rather than concluding there are no callers.
 
 **Library Documentation:**
 - \`get_lib_docs(name)\` — Library overview (e.g. rokkit, kavach)
