@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# Relay hook-gate (relay-engine feature B) — the daemon↔agent control leg.
+#
+# A Claude Code PreToolUse hook: reads the tool-call payload from stdin, POSTs
+# it to the sensei daemon's /hook/gate endpoint, and prints the daemon's JSON
+# response verbatim to stdout. THAT response IS Claude's permissionDecision
+# (allow/deny) — the daemon raises a gate to the phone and blocks for the human's
+# answer, returning allow unless a person explicitly denies.
+#
+# NOT registered in plugin.json by default. This is an opt-in, human-activated
+# control. To activate:
+#   1. add a PreToolUse matcher entry pointing at
+#      "${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd gate"
+#   2. set SENSEI_RELAY_GATE_TOOLS (comma-separated, case-sensitive, e.g.
+#      "Bash,Write"). With it unset/empty the daemon gates nothing (allows all).
+#
+# FAIL-OPEN: if the daemon is down / slow / errors / times out, this prints an
+# `allow` decision and exits 0 so a gate can NEVER block a tool call on
+# infrastructure. Only an explicit human `deny` (returned by the daemon) blocks.
+set -euo pipefail
+
+DAEMON_URL="${SENSEI_DAEMON_URL:-http://127.0.0.1:7744}"
+
+# The fail-open decision: allow, no reason (the daemon fills a reason when it
+# can reach the phone). Printed on any local failure.
+ALLOW='{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow"}}'
+
+# Read the PreToolUse payload from stdin. No payload (e.g. interactive) → allow.
+PAYLOAD=""
+if [ ! -t 0 ]; then
+  PAYLOAD="$(cat)"
+fi
+if [ -z "$PAYLOAD" ]; then
+  echo "$ALLOW"
+  exit 0
+fi
+
+# POST to the daemon and print its JSON decision verbatim. --max-time 55 stays
+# under Claude's 60s hook cap (the daemon's own await is bounded to ~50s); a
+# 2s connect timeout means a down daemon fails fast to allow.
+RESPONSE="$(curl -sS -X POST "${DAEMON_URL}/hook/gate" \
+  -H "Content-Type: application/json" \
+  -d "$PAYLOAD" \
+  --connect-timeout 2 --max-time 55 2>/dev/null)" || RESPONSE=""
+
+# Empty response (curl failed / timed out / daemon down) → fail-open allow.
+if [ -z "$RESPONSE" ]; then
+  echo "$ALLOW"
+  exit 0
+fi
+
+printf '%s\n' "$RESPONSE"
+exit 0
