@@ -138,6 +138,7 @@ You MUST use sensei MCP tools instead of grep/glob for code navigation — they 
 
 ## Workflow Commands
 
+**Front door (start here):** /sensei:intake — clarify intent → recommend-and-confirm a playbook before work. Run it at the start of any new chunk.
 **Phase:** /sensei:idea, /sensei:analyze, /sensei:blueprint, /sensei:experiment, /sensei:plan, /sensei:build, /sensei:validate
 **Cross-cutting:** /sensei:brainstorm, /sensei:review, /sensei:persona, /sensei:agent
 **Context:** /sensei:session, /sensei:rules, /sensei:patterns
