@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# Front-door intake nudge (front-door intake plan, Task 5) — a non-blocking
+# daemon↔agent control leg, sibling to hooks/gate.
+#
+# A Claude Code PreToolUse hook: reads the tool-call payload from stdin, POSTs
+# it to the sensei daemon's /hook/nudge endpoint, and prints the daemon's
+# JSON response verbatim to stdout. Unlike hooks/gate, this response is
+# INFORMATIONAL ONLY — it never carries a permissionDecision and can never
+# block a tool call. It exists so a wrapper (or, in future, Claude Code
+# itself) can surface a one-line suggestion to run `/sensei:intake` when the
+# current session has no confirmed playbook run yet.
+#
+# NOT registered in plugin.json by default. This is an opt-in, human-activated
+# nudge. To activate:
+#   1. add a PreToolUse matcher entry pointing at
+#      "${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd nudge"
+#   2. (optional) chain it after hooks/gate / hooks/forward in the same
+#      matcher's hooks array — order does not matter since this hook never
+#      blocks.
+# Activation is a separate, Jerry-gated decision (mirrors relay-engine
+# feature B's hook-gate posture) — see docs/plan/2026-07-19-frontdoor-intake-plan-2-command-entry.md
+# Task 5.
+#
+# FAIL-OPEN: if the daemon is down / slow / errors / times out, this prints
+# a no-nudge response and exits 0. A nudge outage must never surface noise
+# or interfere with the tool call it observes.
+set -euo pipefail
+
+DAEMON_URL="${SENSEI_DAEMON_URL:-http://127.0.0.1:7744}"
+
+# The fail-open response: no nudge. Printed on any local failure.
+NO_NUDGE='{"nudge":false}'
+
+# Read the PreToolUse payload from stdin. No payload (e.g. interactive) → no nudge.
+PAYLOAD=""
+if [ ! -t 0 ]; then
+  PAYLOAD="$(cat)"
+fi
+if [ -z "$PAYLOAD" ]; then
+  echo "$NO_NUDGE"
+  exit 0
+fi
+
+# POST to the daemon and print its JSON response verbatim. Short timeouts —
+# this is advisory, not gating, so it should never be felt by the user.
+RESPONSE="$(curl -sS -X POST "${DAEMON_URL}/hook/nudge" \
+  -H "Content-Type: application/json" \
+  -d "$PAYLOAD" \
+  --connect-timeout 2 --max-time 5 2>/dev/null)" || RESPONSE=""
+
+# Empty response (curl failed / timed out / daemon down) → fail-open, no nudge.
+if [ -z "$RESPONSE" ]; then
+  echo "$NO_NUDGE"
+  exit 0
+fi
+
+printf '%s\n' "$RESPONSE"
+exit 0
