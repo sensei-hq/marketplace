@@ -169,6 +169,84 @@ else
   assert_true "pre-compact emits telemetry to fallback" "false"
 fi
 
+# ── nudge: CC PreToolUse shaping + fail-open ──────────────────────────────────
+#
+# hooks/nudge reshapes the daemon's `{nudge, message}` into Claude Code's
+# PreToolUse hook-output schema. The global SENSEI_DAEMON_URL (unreachable
+# port) covers the fail-open path via run_hook like every other test above;
+# the shaping path needs a real responder, so this section starts a scoped
+# fake daemon just for these two assertions.
+
+echo ""
+echo "=== nudge (PreToolUse shaping + fail-open) ==="
+
+NUDGE_PAYLOAD='{"hook_event_name":"PreToolUse","session_id":"test-session-1","tool_name":"Bash"}'
+
+# No daemon reachable → fail-open no-op (not the daemon's raw {"nudge":false}).
+output=$(run_hook "nudge" "$NUDGE_PAYLOAD")
+assert_json "fail-open (daemon unreachable) returns no-op" "$output" \
+  "import sys,json; d=json.load(sys.stdin); assert d == {}"
+
+# Scoped fake daemon on an ephemeral port, started fresh per sub-case below
+# (each response shape needs its own listener) and killed right after use.
+# Backgrounded directly in this shell (not inside a command-substitution
+# subshell) so its PID is a real child — kill/wait on it are well-defined.
+FAKE_NUDGE_PORT=8935
+FAKE_NUDGE_SERVER='
+import http.server, sys
+
+body = sys.argv[1].encode()
+
+class Handler(http.server.BaseHTTPRequestHandler):
+    def do_POST(self):
+        length = int(self.headers.get("Content-Length", 0))
+        self.rfile.read(length)
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+    def log_message(self, *a): pass
+
+http.server.HTTPServer(("127.0.0.1", int(sys.argv[2])), Handler).serve_forever()
+'
+
+NUDGE_TRUE_BODY='{"nudge":true,"message":"No playbook chosen for this chunk yet — consider /sensei:intake to pick one."}'
+python3 -c "$FAKE_NUDGE_SERVER" "$NUDGE_TRUE_BODY" "$FAKE_NUDGE_PORT" &
+FAKE_PID=$!
+sleep 0.3
+
+output=$(printf '%s' "$NUDGE_PAYLOAD" | \
+  HOME="$TEMP_HOME" \
+  CLAUDE_PROJECT_ROOT="$TEMP_PROJECT" \
+  CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" \
+  SENSEI_DAEMON_URL="http://127.0.0.1:${FAKE_NUDGE_PORT}" \
+  bash "$SCRIPT_DIR/nudge" 2>/dev/null)
+
+kill "$FAKE_PID" 2>/dev/null || true
+wait "$FAKE_PID" 2>/dev/null || true
+
+assert_json "nudge:true is reshaped into hookSpecificOutput.additionalContext" "$output" \
+  "import sys,json; d=json.load(sys.stdin); assert d['hookSpecificOutput']['hookEventName'] == 'PreToolUse'; assert '/sensei:intake' in d['hookSpecificOutput']['additionalContext']"
+
+# nudge:false from a reachable daemon → no-op, same as fail-open.
+python3 -c "$FAKE_NUDGE_SERVER" '{"nudge":false}' "$FAKE_NUDGE_PORT" &
+FAKE_PID=$!
+sleep 0.3
+
+output=$(printf '%s' "$NUDGE_PAYLOAD" | \
+  HOME="$TEMP_HOME" \
+  CLAUDE_PROJECT_ROOT="$TEMP_PROJECT" \
+  CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" \
+  SENSEI_DAEMON_URL="http://127.0.0.1:${FAKE_NUDGE_PORT}" \
+  bash "$SCRIPT_DIR/nudge" 2>/dev/null)
+
+kill "$FAKE_PID" 2>/dev/null || true
+wait "$FAKE_PID" 2>/dev/null || true
+
+assert_json "nudge:false returns no-op" "$output" \
+  "import sys,json; d=json.load(sys.stdin); assert d == {}"
+
 # ── Cleanup ──────────────────────────────────────────────────────────────────
 
 rm -rf "$TEMP_HOME"

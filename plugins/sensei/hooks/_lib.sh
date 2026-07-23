@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Shared helpers for plugin hook scripts. Source this from a hook script:
 #
 #   source "$(dirname "$0")/_lib.sh"
@@ -15,6 +16,8 @@ FALLBACK_FILE="${HOME}/.sensei/events.jsonl"
 # Read all of stdin into the global PAYLOAD. Sets PAYLOAD="" when there's no
 # input (e.g. hook fired without a payload, or running interactively).
 read_stdin_payload() {
+  # shellcheck disable=SC2034  # PAYLOAD is a global consumed by the sourcing
+  # hook script (session-start, pre-compact, forward all read $PAYLOAD).
   PAYLOAD=""
   if [ -t 0 ]; then
     return 0

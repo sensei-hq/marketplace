@@ -21,10 +21,13 @@ the user before adopting it. Nothing is built here; this is orientation before w
      touched area — to judge blast-radius)
    Ask only what you cannot infer. One question at a time.
 3. Call `recommend_playbook(lifecycle, intent, risk, session_id=<current session>)`. It returns
-   `playbook`, `rationale`, and `opening_tone`.
-4. **Recommend-and-confirm**: tell the user the recommended playbook and the one-line
-   `rationale`. If `risk = high`, you MUST get explicit confirmation. On agreement, call
-   `recommend_playbook(..., confirm="true")` to record the confirmed run.
+   `playbook`, `rationale`, `opening_tone`, and `auto_select` (+ `trust`).
+4. **If `auto_select` is true:** skip the confirm — call `recommend_playbook(..., confirm="true")`
+   to record the run, then tell the user: "Auto-selected **<playbook>** — reliable for this kind of
+   chunk (FTR <trust.ftr> over <trust.n> runs). Say 'change' to pick a different playbook." Adopt
+   `opening_tone` and proceed.
+   **Otherwise (recommend-and-confirm):** state the playbook + one-line `rationale`; on `risk=high`
+   you MUST get explicit confirmation; on agreement call `recommend_playbook(..., confirm="true")`.
 5. Adopt the returned `opening_tone` as the posture for the next stage, and proceed under the
    chosen playbook. (Playbooks are named routes today; follow the tone + when-to-use.)
 6. Call `log_event(type="command_invoked", data="{\"command\":\"intake\",\"args\":\"$ARGUMENTS\"}")` — MANDATORY.

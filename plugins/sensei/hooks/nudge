@@ -3,56 +3,112 @@
 # daemon↔agent control leg, sibling to hooks/gate.
 #
 # A Claude Code PreToolUse hook: reads the tool-call payload from stdin, POSTs
-# it to the sensei daemon's /hook/nudge endpoint, and prints the daemon's
-# JSON response verbatim to stdout. Unlike hooks/gate, this response is
-# INFORMATIONAL ONLY — it never carries a permissionDecision and can never
-# block a tool call. It exists so a wrapper (or, in future, Claude Code
-# itself) can surface a one-line suggestion to run `/sensei:intake` when the
-# current session has no confirmed playbook run yet.
+# it to the sensei daemon's /hook/nudge endpoint, and reshapes the daemon's
+# `{nudge, message}` JSON into Claude Code's PreToolUse hook-output schema —
+# the daemon's raw shape is NOT something Claude Code recognises, so printing
+# it verbatim (as an earlier version of this hook did) surfaced nothing. When
+# the daemon says `nudge:true`, this emits the message as `additionalContext`
+# (mirrors hooks/gate's `gate_decision` shaping, and session-start/pre-compact's
+# `hookSpecificOutput.additionalContext` context-injection convention):
 #
-# NOT registered in plugin.json by default. This is an opt-in, human-activated
-# nudge. To activate:
-#   1. add a PreToolUse matcher entry pointing at
-#      "${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd nudge"
-#   2. (optional) chain it after hooks/gate / hooks/forward in the same
-#      matcher's hooks array — order does not matter since this hook never
-#      blocks.
-# Activation is a separate, Jerry-gated decision (mirrors relay-engine
-# feature B's hook-gate posture) — see docs/plan/2026-07-19-frontdoor-intake-plan-2-command-entry.md
+#   {"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"<message>"}}
+#
+# Unlike hooks/gate, this response is INFORMATIONAL ONLY — it never carries a
+# permissionDecision and can never block a tool call. It exists to surface a
+# one-line suggestion to run `/sensei:intake` when the current session has no
+# confirmed playbook run yet (the daemon nudges at most once per session —
+# see hook_nudge's once-per-session guard).
+#
+# Registered in plugin.json's PreToolUse matcher, alongside hooks/forward.
+# It never blocks, so registration order relative to forward/gate does not
+# matter. See docs/plan/2026-07-19-frontdoor-intake-plan-2-command-entry.md
 # Task 5.
 #
-# FAIL-OPEN: if the daemon is down / slow / errors / times out, this prints
-# a no-nudge response and exits 0. A nudge outage must never surface noise
-# or interfere with the tool call it observes.
+# FAIL-OPEN: if the daemon is down / slow / errors / times out / returns
+# something unparseable, this prints an empty no-op response (`{}`) and exits
+# 0. A nudge outage must never surface noise or interfere with the tool call
+# it observes.
 set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/_lib.sh"
 
 DAEMON_URL="${SENSEI_DAEMON_URL:-http://127.0.0.1:7744}"
 
-# The fail-open response: no nudge. Printed on any local failure.
-NO_NUDGE='{"nudge":false}'
+# The fail-open / no-nudge response: an empty hook output (no-op — Claude
+# Code ignores unrecognised/absent fields, so `{}` surfaces nothing).
+NO_OP='{}'
 
-# Read the PreToolUse payload from stdin. No payload (e.g. interactive) → no nudge.
+# Read the PreToolUse payload from stdin. No payload (e.g. interactive) → no-op.
 PAYLOAD=""
 if [ ! -t 0 ]; then
   PAYLOAD="$(cat)"
 fi
 if [ -z "$PAYLOAD" ]; then
-  echo "$NO_NUDGE"
+  echo "$NO_OP"
   exit 0
 fi
 
-# POST to the daemon and print its JSON response verbatim. Short timeouts —
-# this is advisory, not gating, so it should never be felt by the user.
+# POST to the daemon. Short timeouts — this is advisory, not gating, so it
+# should never be felt by the user.
 RESPONSE="$(curl -sS -X POST "${DAEMON_URL}/hook/nudge" \
   -H "Content-Type: application/json" \
   -d "$PAYLOAD" \
   --connect-timeout 2 --max-time 5 2>/dev/null)" || RESPONSE=""
 
-# Empty response (curl failed / timed out / daemon down) → fail-open, no nudge.
+# Empty response (curl failed / timed out / daemon down) → fail-open, no-op.
 if [ -z "$RESPONSE" ]; then
-  echo "$NO_NUDGE"
+  echo "$NO_OP"
   exit 0
 fi
 
-printf '%s\n' "$RESPONSE"
+# Pull `nudge`/`message` out of the daemon's response. Prefer jq when present
+# (not guaranteed — macOS ships without it, see _lib.sh); fall back to python3
+# (guaranteed present — session-start already depends on it). Any parse
+# failure on either path leaves NUDGE empty, which the shaping step below
+# treats as fail-open no-op.
+NUDGE=""
+MESSAGE=""
+if command -v jq >/dev/null 2>&1; then
+  NUDGE="$(printf '%s' "$RESPONSE" | jq -r 'if .nudge == true then "true" else "" end' 2>/dev/null)" || NUDGE=""
+  if [ "$NUDGE" = "true" ]; then
+    MESSAGE="$(printf '%s' "$RESPONSE" | jq -r '.message // empty' 2>/dev/null)" || MESSAGE=""
+  fi
+else
+  NUDGE="$(printf '%s' "$RESPONSE" | python3 -c '
+import sys, json
+try:
+    d = json.load(sys.stdin)
+    print("true" if d.get("nudge") is True else "")
+except Exception:
+    print("")
+' 2>/dev/null)" || NUDGE=""
+  if [ "$NUDGE" = "true" ]; then
+    MESSAGE="$(printf '%s' "$RESPONSE" | python3 -c '
+import sys, json
+try:
+    d = json.load(sys.stdin)
+    print(d.get("message") or "")
+except Exception:
+    print("")
+' 2>/dev/null)" || MESSAGE=""
+  fi
+fi
+
+# No nudge (false / unparseable / missing) or an empty message → no-op.
+if [ "$NUDGE" != "true" ] || [ -z "$MESSAGE" ]; then
+  echo "$NO_OP"
+  exit 0
+fi
+
+ESCAPED="$(escape_for_json "$MESSAGE")"
+
+cat <<EOF
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "additionalContext": "${ESCAPED}"
+  }
+}
+EOF
 exit 0
