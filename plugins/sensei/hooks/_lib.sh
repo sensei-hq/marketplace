@@ -62,9 +62,18 @@ send_telemetry() {
 }
 
 # Escape a string for embedding inside a JSON string value — for hooks that
-# build their own output without jq. Handles backslash, double-quote, and the
-# common control characters (newline, carriage return, tab).
+# build their own output without jq. Prefer python3 (on macOS by default):
+# json.dumps escapes EVERY control character (U+0000–U+001F) + backslash/quote,
+# so the assembled additionalContext is always valid JSON. The hand-rolled path
+# is a fallback only — it misses exotic control chars and (in some bash builds)
+# fails to globally escape a large multi-line context, which silently produced
+# invalid-JSON hook output. `[1:-1]` strips json.dumps's surrounding quotes to
+# match this function's "inner escaped value" contract.
 escape_for_json() {
+  if command -v python3 >/dev/null 2>&1; then
+    printf '%s' "$1" | python3 -c 'import json,sys; sys.stdout.write(json.dumps(sys.stdin.read())[1:-1])'
+    return
+  fi
   local s="$1"
   s="${s//\\/\\\\}"
   s="${s//\"/\\\"}"
