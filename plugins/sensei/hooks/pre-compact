@@ -10,11 +10,18 @@ PROJECT_ROOT="${CLAUDE_PROJECT_ROOT:-${PWD}}"
 read_stdin_payload
 send_telemetry "$PAYLOAD"
 
-# ── Read rules ──────────────────────────────────────────────────────────
-RULES_FILE="${PROJECT_ROOT}/.sensei/rules.md"
+# ── Re-inject the MANDATORY tier (D-INJECT) ──────────────────────────────
+# Pushed from the daemon so the non-negotiable rules survive compaction intact —
+# the old `head -60 .sensei/rules.md` could truncate them. Plain-text markdown
+# (no jq); fall back to the static file when the daemon is down.
 RULES=""
-if [ -f "$RULES_FILE" ]; then
-  RULES=$(head -60 "$RULES_FILE")
+REPO_RULES=$(curl -s --connect-timeout 1 --max-time 3 \
+  "${DAEMON_URL}/api/knowledge/rules?folder=${PROJECT_ROOT}&format=md&tiers=mandatory" 2>/dev/null || true)
+if [ -n "$REPO_RULES" ] && [ "${REPO_RULES:0:1}" != "{" ]; then
+  RULES="$REPO_RULES"
+else
+  RULES_FILE="${PROJECT_ROOT}/.sensei/rules.md"
+  [ -f "$RULES_FILE" ] && RULES=$(head -60 "$RULES_FILE")
 fi
 
 # ── Mindsets (shipped as subagents) ──────────────────────────────────────────

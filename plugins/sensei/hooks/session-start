@@ -56,6 +56,20 @@ $(sed -e '/^<!--/,/-->/d' "$GLOBAL_RULES_FILE" | head -80)
 Repository-specific rules resolve live — call the \`get_rules\` MCP tool."
 fi
 
+# ── Repository rules — pushed, tier-aware (D-INJECT) ──────────────────────────
+# Push the repo's resolved mandatory + required rules INLINE so they stick
+# without the agent having to remember to call get_rules. Plain-text markdown
+# from the daemon (no jq needed). Silent no-op when the daemon is down, the repo
+# isn't indexed (JSON error — skip anything starting with '{'), or none resolve.
+REPO_RULES_SECTION=""
+REPO_RULES=$(curl -s --connect-timeout 1 --max-time 3 \
+  "${DAEMON_URL}/api/knowledge/rules?folder=${PROJECT_ROOT}&format=md&tiers=mandatory,required" 2>/dev/null || true)
+if [ -n "$REPO_RULES" ] && [ "${REPO_RULES:0:1}" != "{" ]; then
+  REPO_RULES_SECTION="## Repository Rules — pushed (mandatory + required)
+${REPO_RULES}
+Mandatory rules are non-negotiable and cannot be overridden. Recommended / advisory rules resolve live — call the \`get_rules\` MCP tool."
+fi
+
 # ── Mindsets (shipped as subagents — lean reminder only) ─────────────────────
 # Mindsets are agents (plugin agents/). Inject a lean pointer, not the full
 # question set — the detail lives in each agent and loads on demand.
@@ -104,6 +118,8 @@ Daemon: ${DAEMON_STATUS}
 ${STATE_SECTION}
 
 ${GLOBAL_RULES_SECTION}
+
+${REPO_RULES_SECTION}
 
 ${RULES_SECTION}
 

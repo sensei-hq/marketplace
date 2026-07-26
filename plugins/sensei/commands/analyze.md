@@ -7,6 +7,14 @@ argument-hint: What to analyze (or omit to analyze the most recent idea doc)
 
 Feasibility assessment. Reads prior idea docs, scans the codebase for related patterns and existing code, and produces 2-3 approaches with tradeoffs. The user picks an approach. No code is written.
 
+## Modes
+
+- **Deep-analysis mode** — when analyzing an objective to feed an automated run (grill for depth
+  using the code + doc graph, resolve conflicts, record decisions before planning): invoke the
+  **`analyzer`** skill and follow it. Its output is the deep doc the `planner` decomposes into an
+  executable graph.
+- **Feasibility mode** (the procedure below) — assess an idea doc and produce options with tradeoffs.
+
 ## Procedure
 
 1. Call `update_phase(phase="analyze")` — MANDATORY

@@ -7,6 +7,16 @@ argument-hint: What to plan (or omit to plan the most recent blueprint)
 
 Breaks a blueprint into ordered, implementable features. Each feature has acceptance criteria, test scenarios, and layer breakdown. Creates GitHub issues for tracking.
 
+## Modes
+
+- **Automated-run mode** — when the goal is for an autonomous run you'll hand to `/sensei:execute`
+  (a plan **graph** with per-task agent/model/spec-ref, registered to Dōjō): invoke the **`planner`**
+  skill and follow it instead of the GitHub-issue flow below. It produces a machine-executable graph
+  under `docs/plan/<plan-id>/` and registers it via `register_plan`. Planning needs analysis first —
+  if there's no analysis/design doc for the objective, run `/sensei:analyze` first.
+- **Human-tracked mode** (the procedure below) — decompose a blueprint into features + GitHub issues
+  for a person to pick up.
+
 ## Procedure
 
 1. Call `update_phase(phase="plan")` — MANDATORY
