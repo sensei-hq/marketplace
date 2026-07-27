@@ -5,19 +5,19 @@ description: >-
   feature breakdown). Decompose a goal into a phase→task GRAPH where every task carries its
   assigned agent, model, spec reference, verification, and typed dependencies, then register it
   to the daemon + Dōjō via the `register_plan` MCP tool so the whole plan is watchable before
-  execution and an executor can drive it. Runs AFTER analysis. Distinct from the human-pipeline
+  execution and an builder can drive it. Runs AFTER analysis. Distinct from the human-pipeline
   `/sensei:plan` (blueprint → features → GitHub issues).
 ---
 
 # Planner — the automated-run plan graph
 
-You produce a **plan graph** an executor can drive without asking questions: a graph of
+You produce a **plan graph** an builder can drive without asking questions: a graph of
 phases → tasks where each task is self-contained enough to hand to a fresh subagent. This is
 the phase-1 (Claude-CLI-driven) planner of `docs/design/automated-run.md`.
 
 ## When to use vs the plan command's human mode
 
-- **This skill** — the goal is an *autonomous run* you'll hand to `/sensei:execute`. Output is
+- **This skill** — the goal is an *autonomous run* you'll hand to `/sensei:build`. Output is
   the machine-executable graph + its registration to Dōjō.
 - The plain human pipeline (blueprint → features → GitHub issues) is a different mode of
   `/sensei:plan`; don't produce GitHub issues here.
@@ -87,7 +87,7 @@ Before registering, self-review the graph:
 - `deps` reference real task ids, form a **DAG** (no cycles), no dangling refs;
 - each task is independently buildable by a fresh subagent from its `spec_ref` alone.
 
-If a task fails the bar, deepen its spec — don't register a plan an executor will stall on.
+If a task fails the bar, deepen its spec — don't register a plan an builder will stall on.
 
 ## Register the plan to the daemon + Dōjō
 
@@ -111,11 +111,18 @@ register_plan(
 
 The daemon **validates** the graph (unique ids, deps resolve, DAG — a bad graph is rejected),
 stores it, and authors the Dōjō outline from it, so the whole plan (with assigned models) is
-visible on the phone **before** execution. It returns the `run_id`.
+visible on the phone **before** execution. It returns the `run_id` and a **`track_url`** — the
+auth-gated Dōjō link to watch this plan/run.
 
 Only labels cross to Dōjō (agent/model/`spec_ref` path, titles, status) — never spec bodies,
 code, or diffs (zero-knowledge).
 
 ## Handoff
 
-Report the `run_id` and the plan folder, then hand to `/sensei:execute` to drive the graph.
+Report the `run_id`, the plan folder, and the **Dōjō plan URL** so the human can watch it:
+
+> **Track your plan:** print `track_url` from the `register_plan` response verbatim — the
+> auth-gated Dōjō view of active plans/runs (sign in to open it). If `track_url` is null (no Dōjō
+> connected), say the plan is local-only and skip the link — never fabricate a URL.
+
+Then hand to `/sensei:build` to drive the graph.

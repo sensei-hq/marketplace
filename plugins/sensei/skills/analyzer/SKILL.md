@@ -30,7 +30,7 @@ this area, so you extend rather than contradict.
 ## 2. Grill the user for depth
 
 Ask **one theme at a time** and don't move on until it's specified. Cover the unknowns an
-executor can't invent:
+builder can't invent:
 - the real problem + who it serves + what "done" looks like (observable);
 - constraints, edge cases, failure modes, security/trust boundaries;
 - where it fits existing architecture; what it must NOT change (scope);

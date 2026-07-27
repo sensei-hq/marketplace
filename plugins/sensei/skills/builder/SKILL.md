@@ -1,5 +1,5 @@
 ---
-name: executor
+name: builder
 description: >-
   Use when driving a registered automated-run plan graph to completion — a resilient loop that
   dispatches parallelizable tasks as subagents, flips each task's state and reports progress to
