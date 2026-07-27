@@ -74,15 +74,6 @@
       "path": "skills/ui-state-pattern/SKILL.md"
     },
     {
-      "name": "analyze",
-      "kind": "skill",
-      "description": "Deep analysis of codebase architecture and dependencies",
-      "scope": "project",
-      "recommended_for": ["all"],
-      "stage": ["init", "active"],
-      "path": "skills/analyze/SKILL.md"
-    },
-    {
       "name": "tauri-playwright-testing",
       "kind": "skill",
       "description": "E2E testing guide for Tauri desktop apps — build flags, globalSetup, navigation caveats, TauriPage API quirks, and build-time test-mode configuration",

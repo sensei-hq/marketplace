@@ -9,7 +9,7 @@ Breaks a blueprint into ordered, implementable features. Each feature has accept
 
 ## Modes
 
-- **Automated-run mode** — when the goal is for an autonomous run you'll hand to `/sensei:execute`
+- **Automated-run mode** — when the goal is for an autonomous run you'll hand to `/sensei:build`
   (a plan **graph** with per-task agent/model/spec-ref, registered to Dōjō): invoke the **`planner`**
   skill and follow it instead of the GitHub-issue flow below. It produces a machine-executable graph
   under `docs/plan/<plan-id>/` and registers it via `register_plan`. Planning needs analysis first —
