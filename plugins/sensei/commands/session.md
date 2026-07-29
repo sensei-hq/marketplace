@@ -69,7 +69,7 @@ Open Issues (latest 5):
 
 ### Refocus
 
-1. Read `.sensei/state.yaml`. Extract: `phase`, `task`, `issue`, `active_plan`, `active_issue`.
+1. Call `get_workflow_state()` (the daemon reads it from Postgres — there is no `.sensei/state.yaml` file). Extract: `active_phase`, `active_task`, `active_issue`, `active_plan`.
 2. If `active_plan` is set, read that file. Extract the current feature name and acceptance criteria.
 3. If `active_issue` is set and `gh` CLI is available, run `gh issue view <active_issue>` and pull the issue title and body.
 4. Read `.sensei/rules.md`. Produce a compact bullet summary (one line per rule, no elaboration).
