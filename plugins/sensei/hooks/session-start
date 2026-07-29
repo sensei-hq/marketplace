@@ -98,12 +98,17 @@ ${PERSONA_SUMMARIES}
 When validating work, consider each persona's goals and validates criteria."
 fi
 
-# ── Read workflow state ──────────────────────────────────────────────────────
-STATE_FILE="${PROJECT_ROOT}/.sensei/state.yaml"
+# ── Read workflow state (from the daemon — Postgres is the source of truth) ──
+# Fetch the resolved workflow state as pre-formatted markdown and inject it, the
+# same way repo rules are pushed above. No local .sensei/state.yaml mirror (it
+# drifted and injected a stale phase/issue). Silent no-op when the daemon is
+# down, the project is unknown, or nothing is set (skip a JSON error body).
 STATE_SECTION=""
-if [ -f "$STATE_FILE" ]; then
+STATE_BODY=$(curl -s --connect-timeout 1 --max-time 3 \
+  "${DAEMON_URL}/api/state/${PROJECT_NAME}?format=md" 2>/dev/null || true)
+if [ -n "$STATE_BODY" ] && [ "${STATE_BODY:0:1}" != "{" ]; then
   STATE_SECTION="## Workflow State
-$(cat "$STATE_FILE")
+${STATE_BODY}
 Run /sensei:session status for full orientation. Run /sensei:session refocus to re-anchor."
 fi
 

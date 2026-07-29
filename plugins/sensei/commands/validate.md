@@ -11,7 +11,7 @@ End-to-end verification after implementation. Checks that tests pass, acceptance
 
 1. Call `update_phase(phase="validate")` — MANDATORY
 2. Call `log_event(type="command_invoked", data="{\"command\":\"validate\"}")` — MANDATORY
-3. Read `.sensei/state.yaml` for active issue
+3. Call `get_workflow_state()` for the active issue (daemon-backed; no `.sensei/state.yaml` file)
 4. If issue specified or active:
    - Run `gh issue view <number> --json title,body` to get acceptance criteria
 5. Run the full test suite:

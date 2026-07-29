@@ -4,6 +4,7 @@ set -euo pipefail
 source "$(dirname "$0")/_lib.sh"
 
 PROJECT_ROOT="${CLAUDE_PROJECT_ROOT:-${PWD}}"
+PROJECT_NAME="$(basename "$PROJECT_ROOT")"
 
 # Forward telemetry first so the event reaches the daemon even if the
 # context-building below fails.
@@ -27,11 +28,14 @@ fi
 # ── Mindsets (shipped as subagents) ──────────────────────────────────────────
 MINDSETS_SUMMARY="Core three in sequence: Analyst → Developer → Acceptance Tester; specialists by domain. Each is a subagent — invoke via /sensei:agent."
 
-# ── Read workflow state ──────────────────────────────────────────────────────
-STATE_FILE="${PROJECT_ROOT}/.sensei/state.yaml"
+# ── Read workflow state (from the daemon — the DB, not a local mirror) ───────
+# Same pushed-from-daemon pattern as the rules above; no .sensei/state.yaml
+# (it drifted). Silent no-op when the daemon is down / nothing set / JSON error.
 STATE=""
-if [ -f "$STATE_FILE" ]; then
-  STATE=$(cat "$STATE_FILE")
+STATE_BODY=$(curl -s --connect-timeout 1 --max-time 3 \
+  "${DAEMON_URL}/api/state/${PROJECT_NAME}?format=md" 2>/dev/null || true)
+if [ -n "$STATE_BODY" ] && [ "${STATE_BODY:0:1}" != "{" ]; then
+  STATE="$STATE_BODY"
 fi
 
 # ── Build context ────────────────────────────────────────────────────────────

@@ -128,10 +128,9 @@ output=$(run_hook "session-start" "$SESSION_PAYLOAD")
 assert_json "loads rules when present" "$output" \
   "import sys,json; d=json.load(sys.stdin); assert 'test-rule-alpha' in d['additional_context']"
 
-printf 'active_phase: build\nactive_issue: 42\n' > "$TEMP_PROJECT/.sensei/state.yaml"
-output=$(run_hook "session-start" "$SESSION_PAYLOAD")
-assert_json "loads state when present" "$output" \
-  "import sys,json; d=json.load(sys.stdin); assert 'active_phase: build' in d['additional_context']"
+# Workflow state now comes from the daemon (GET /api/state/{project}?format=md),
+# not a .sensei/state.yaml file — the formatting is covered by the senseid
+# `workflow_state_md` unit test; nothing to seed here.
 
 # session-start should have also fired telemetry on each invocation
 sleep 0.3
@@ -140,7 +139,7 @@ if [ -s "$fallback" ]; then
 else
   assert_true "session-start emits telemetry to fallback" "false"
 fi
-rm -f "$fallback" "$TEMP_PROJECT/.sensei/rules.md" "$TEMP_PROJECT/.sensei/state.yaml"
+rm -f "$fallback" "$TEMP_PROJECT/.sensei/rules.md"
 
 # ── pre-compact: telemetry + context injection ───────────────────────────────
 
