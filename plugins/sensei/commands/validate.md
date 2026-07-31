@@ -16,7 +16,8 @@ End-to-end verification after implementation. Checks that tests pass, acceptance
    - Run `gh issue view <number> --json title,body` to get acceptance criteria
 5. Run the full test suite:
    - Detect test command from project (cargo test, bun run test, etc.)
-   - Run it — all tests must pass
+   - Run it — all tests must pass. Paste the ACTUAL result tail (pass/fail counts); read the real exit code, not a piped one (`… | tail` reports the pipe's status).
+   - **UI diffs — Playwright is MANDATORY:** if `git diff --name-only` touches UI (`.svelte` / `.tsx` / component / route files), also run the Playwright / component suite (the `tauri-playwright-testing` skill for the desktop `app/`; the `dojo`/`app` component suite otherwise) and paste the result. A UI change "verified by reading the component" is NOT verified — the criterion is unmet until the suite runs green.
 6. Check acceptance criteria:
    - Go through each criterion from the issue
    - Verify each is met — not "probably" but demonstrate it
@@ -35,4 +36,5 @@ End-to-end verification after implementation. Checks that tests pass, acceptance
 
 - Do not close the issue if any criterion is not met
 - Run the FULL test suite, not just new tests
+- A UI diff is not validated until the Playwright / component suite runs green — no reading-only sign-off
 - All MCP calls are MANDATORY
