@@ -12,6 +12,17 @@ Checks code quality across multiple dimensions. Auto-triggered after `/sensei:bu
 1. Call `log_event(type="command_invoked", data="{\"command\":\"review\"}")` — MANDATORY. Review is cross-cutting — do NOT change the workflow phase; it runs within the current phase (typically build or validate).
 2. Read `.sensei/rules.md` — rules inform what to check
 
+### Step 0: Resolve review depth (MANDATORY — do this FIRST)
+
+The gate that decides *how hard* to review, so rigor lands on the changes that matter.
+
+1. Get the changed paths: `git diff --name-only` (or the scope's files).
+2. Call `resolve_risk_class(paths=[...], task="<current task>")` → `{class, reasons}`.
+3. Set the depth from `class` and state it (+ reasons) at the top of the report:
+   - **approve** — identity / auth / money / secrets / schema / governance touched. Run ALL checks below **and** an adversarial pass: for each finding try to *refute* it, and actively hunt an input that breaks the change; require **live verification evidence** (the actual test-run tail, a `psql` count, a `curl :7744` status, a Playwright run for UI) — never "looks correct"; and state explicitly that this change needs **human sign-off**.
+   - **review** — production source. Run all checks with real verification (do not assume-green; run the tests).
+   - **auto** — docs / tests / config only. A light pass suffices; note the class and skip the heavy adversarial pass.
+
 ### Check 1: Pattern conformance
 
 1. Get modified files from `git diff --name-only` (or all files if scope is "all")
