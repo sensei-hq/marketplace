@@ -38,6 +38,15 @@
       "path": "skills/blast-radius/SKILL.md"
     },
     {
+      "name": "dry-check",
+      "kind": "skill",
+      "description": "Before writing any new function, type, or helper, search the indexed code graph (search / get_duplicates / get_callers) for an existing implementation and reuse it. Tool-backed DRY — an unsearched new function is a review finding.",
+      "scope": "general",
+      "recommended_for": ["all"],
+      "stage": ["active", "maintenance"],
+      "path": "skills/dry-check/SKILL.md"
+    },
+    {
       "name": "verify-deploy",
       "kind": "skill",
       "description": "When a change only takes effect through a built/deployed artifact, clean-rebuild on interface changes, smoke the live artifact (cache-bust), and install as part of completion. A feature isn't done while the running artifact is stale.",
@@ -380,6 +389,15 @@
       "recommended_for": ["all"],
       "stage": ["active"],
       "path": "agents/acceptance-tester.md"
+    },
+    {
+      "name": "sensei-test-reviewer",
+      "kind": "agent",
+      "description": "Audit tests against the functional need — catch assertions on fallbacks/mocks, vacuous asserts, criteria with no failing test; mutation spot-check",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "agents/test-reviewer.md"
     },
     {
       "name": "sensei-ux-designer",

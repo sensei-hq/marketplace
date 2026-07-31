@@ -64,6 +64,25 @@ When invoked:
 7. Run the project's test command (detect it: `cargo test`, `make test`, `<pm> test` for JS/TS, `pytest`, `go test ./...`) to check for regressions
 8. Produce a structured verdict
 
+## Verification evidence (required — no assume-green)
+
+Reviewing by reading is not reviewing. Before you report a verdict, run the checks your
+domain owns and paste the ACTUAL output as evidence — never "looks correct":
+
+- **Tests** — run the project's test command for the touched area (`cargo test` / `make test` /
+  `<pm> test` / `pytest` / `go test ./...`) and paste the result tail (pass/fail counts). A
+  change you can't show passing tests for is not verified.
+- **Live state** (data / endpoint / deploy-facing changes) — query the real thing: `psql` for a
+  row or count, `curl :7744` for an endpoint status, the deployed artifact for a cache-busted
+  smoke. Confirm the effect itself, not a proxy for it.
+- **UI diffs** — run the Playwright / component suite; a component "verified by reading" is not
+  verified.
+- Read the REAL command output, not a masked wrapper: a piped exit code (`… | tail`,
+  `grep -c FAILED`) reports the pipe's status, not the command's.
+
+If you cannot produce the evidence (no test exists, the command fails, the daemon is down),
+say so explicitly and lower your confidence — never pass unverified work as green.
+
 ## Report Format
 
 ```
