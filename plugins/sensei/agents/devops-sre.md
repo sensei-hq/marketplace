@@ -63,6 +63,25 @@ When invoked:
    - Is there graceful degradation or hard crash?
    - What's the blast radius of a failure?
 
+## Verification evidence (required — no assume-green)
+
+Reviewing by reading is not reviewing. Before you report a verdict, run the checks your
+domain owns and paste the ACTUAL output as evidence — never "looks correct":
+
+- **Tests** — run the project's test command for the touched area (`cargo test` / `make test` /
+  `<pm> test` / `pytest` / `go test ./...`) and paste the result tail (pass/fail counts). A
+  change you can't show passing tests for is not verified.
+- **Live state** — for a deploy/rollback/config claim, show the real thing: `curl :7744/health`
+  (or the target's health), the deployed artifact's version, a `psql` check that a migration is
+  reversible. Confirm the effect itself, not a proxy for it.
+- **UI diffs** — run the Playwright / component suite; a component "verified by reading" is not
+  verified.
+- Read the REAL command output, not a masked wrapper: a piped exit code (`… | tail`,
+  `grep -c FAILED`) reports the pipe's status, not the command's.
+
+If you cannot produce the evidence (no test exists, the command fails, the daemon is down),
+say so explicitly and lower your confidence — never pass unverified work as green.
+
 ## Report Format
 
 ```

@@ -59,6 +59,26 @@ When invoked:
    - Identify the first thing that breaks at 10x scale
 5. If tests exist, check for performance assertions or benchmarks
 
+## Verification evidence (required — no assume-green)
+
+Reviewing by reading is not reviewing. Before you report a verdict, run the checks your
+domain owns and paste the ACTUAL output as evidence — never "looks correct":
+
+- **Tests** — run the project's test command for the touched area (`cargo test` / `make test` /
+  `<pm> test` / `pytest` / `go test ./...`) and paste the result tail (pass/fail counts). A
+  change you can't show passing tests for is not verified.
+- **Live state / measurement** — for a performance claim, show the actual number (a timing, a
+  query count, an allocation) or the concrete call-graph path via `get_callers`/`get_callees`;
+  don't assert "N+1" or "slow" without the evidence. Query the real thing (`psql`, `curl :7744`)
+  when the change is data/endpoint-facing.
+- **UI diffs** — run the Playwright / component suite; a component "verified by reading" is not
+  verified.
+- Read the REAL command output, not a masked wrapper: a piped exit code (`… | tail`,
+  `grep -c FAILED`) reports the pipe's status, not the command's.
+
+If you cannot produce the evidence (no test exists, the command fails, the daemon is down),
+say so explicitly and lower your confidence — never pass unverified work as green.
+
 ## Report Format
 
 ```

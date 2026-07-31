@@ -61,6 +61,7 @@ Before writing ANY code, use MCP tools to find the right files:
 3. Call `get_callers()` on symbols you plan to modify to understand blast radius
 4. Call `get_callees()` to understand dependencies
 5. If using a third-party library, call `get_lib_docs()` first
+6. **`dry-check` before net-new code — MANDATORY.** Before writing any new function/type/helper, `search()` + `get_duplicates()` for an existing implementation and reuse it if one exists. Don't add a fourth near-identical helper; the tool answers "is this already here?" (review verifies this happened).
 
 If `match_pattern()` returns results:
 - Show the user: "Found pattern: [name] ([N] instances). Reference: [file]. Should I follow this pattern?"
