@@ -2,6 +2,60 @@
   "version": "0.6.1",
   "items": [
     {
+      "name": "verify-outcome",
+      "kind": "skill",
+      "description": "Confirm the REAL result of a build/test/deploy/command, never a wrapper that can mask failure (piped exit codes, grep counts, cached responses). Enforces the mandatory verify-the-outcome rule.",
+      "scope": "general",
+      "recommended_for": ["all"],
+      "stage": ["active", "maintenance"],
+      "path": "skills/verify-outcome/SKILL.md"
+    },
+    {
+      "name": "data-reality-check",
+      "kind": "skill",
+      "description": "Before declaring a task done or a data correction complete, query the real state (rows, counts, deployed artifact) that proves the claim. Enforces the mandatory done=verified rule.",
+      "scope": "general",
+      "recommended_for": ["all"],
+      "stage": ["active", "maintenance"],
+      "path": "skills/data-reality-check/SKILL.md"
+    },
+    {
+      "name": "ground-before-scope",
+      "kind": "skill",
+      "description": "Before starting a task from a title, read the spec's Resolved design + the live schema/data, then restate the task from what you found. Prevents building the wrong thing from an assumed scope.",
+      "scope": "general",
+      "recommended_for": ["all"],
+      "stage": ["design", "active"],
+      "path": "skills/ground-before-scope/SKILL.md"
+    },
+    {
+      "name": "blast-radius",
+      "kind": "skill",
+      "description": "Before changing a shared type, table, column, or enum, enumerate every construction site, call site, FK, and consumer, and fix them in the same change. Prevents compile breaks + silent schema quirks.",
+      "scope": "general",
+      "recommended_for": ["all"],
+      "stage": ["active", "maintenance"],
+      "path": "skills/blast-radius/SKILL.md"
+    },
+    {
+      "name": "verify-deploy",
+      "kind": "skill",
+      "description": "When a change only takes effect through a built/deployed artifact, clean-rebuild on interface changes, smoke the live artifact (cache-bust), and install as part of completion. A feature isn't done while the running artifact is stale.",
+      "scope": "general",
+      "recommended_for": ["all"],
+      "stage": ["active", "maintenance"],
+      "path": "skills/verify-deploy/SKILL.md"
+    },
+    {
+      "name": "recall-canon",
+      "kind": "skill",
+      "description": "Before designing or re-opening a decision, check the loaded memory index / governance rules for a prior settled decision, and if one exists, cite and apply it instead of re-deriving. Stops re-litigating settled decisions.",
+      "scope": "general",
+      "recommended_for": ["all"],
+      "stage": ["design", "active"],
+      "path": "skills/recall-canon/SKILL.md"
+    },
+    {
       "name": "codebase-indexing",
       "kind": "skill",
       "description": "Index an unfamiliar codebase for efficient navigation",
