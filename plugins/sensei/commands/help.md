@@ -95,24 +95,53 @@ Invoke with `/sensei:agent use <name> [task description]`. Agents run autonomous
 | `sensei-ux-designer` | Usability, accessibility, consistency of user-facing surfaces | When a task involves commands, UI components, output formatting, or user-facing messages |
 | `sensei-devops-sre` | Deployability, monitoring, rollback safety, failure modes | When a task involves deployment, infrastructure, configuration, or reliability-sensitive changes |
 | `sensei-persona-reviewer` | Persona validation — review work from each defined project persona's perspective | After implementation to verify the work serves each persona's goals and criteria |
+| `sensei-test-reviewer` | Test-intent audit — tests vs the functional need, with a mutation spot-check | After implementation/TDD to catch assertions on fallbacks/mocks and acceptance criteria with no failing test |
+| `sensei-plan-depth-reviewer` | Pre-run plan depth gate — observable criteria, no TBDs, pre-answered ambiguities | Before a daemon-owned autonomous run — confirm each feature is deep enough to build without asking |
 
 ## Skills (auto-applied)
 
-These activate automatically — you don't invoke them manually.
+These activate automatically from their description — you don't invoke them manually.
+
+**Discipline (general)**
+
+| Skill | Triggers when... |
+|-------|-----------------|
+| `recall-canon` | Before designing or re-opening a decision — check the loaded canon for a settled answer |
+| `ground-before-scope` | Before starting from a task title — read the resolved design + live schema/data first |
+| `dry-check` | Before writing net-new code — search the index (`search`/`get_duplicates`) for an existing impl |
+| `blast-radius` | Before changing a shared type / table / column / enum — enumerate every touch-point |
+| `verify-outcome` | Confirming a build/test/command result — read the REAL output, not a wrapper that can mask it |
+| `data-reality-check` | Before declaring done — query the real rows / counts / deployed artifact that prove the claim |
+| `verify-deploy` | Shipping via a built/deployed artifact — clean-rebuild, smoke the live artifact, install as completion |
+| `knowledge-capture` | Session start (load memory) and when a capture trigger fires (correction / revert / "actually") |
+
+**Build / plan**
+
+| Skill | Triggers when... |
+|-------|-----------------|
+| `planner` | Turning a goal into an ordered, buildable plan |
+| `plan-depth-review` | Grading a plan's depth before an autonomous run (also the `sensei-plan-depth-reviewer` agent) |
+| `builder` | Driving a plan through the locate → TDD → review build loop |
+| `test-gen` | Adding test coverage to untested or under-tested code |
+| `refactor` | Improving code structure without changing behaviour |
+
+**Codebase / docs**
 
 | Skill | Triggers when... |
 |-------|-----------------|
 | `codebase-indexing` | First working on a repo, after a major refactor, or when `llmspec.yaml` has placeholders |
-| `analyze` | Starting on an unfamiliar repo or after significant changes — structured health check |
+| `analyzer` | Starting on an unfamiliar repo or after significant changes — structured health check |
 | `reverse-engineering` | Reverse-engineering a codebase into product/feature/audit docs (via `/sensei:spec`) |
-| `test-gen` | Adding test coverage to untested or under-tested code |
-| `refactor` | Improving code structure without changing behaviour |
 | `extract-docs` | Generating or updating documentation for a module from its code |
+| `identify-unknown-libs` | `get_lib_docs` returns empty sections — register missing library docs |
+
+**UI**
+
+| Skill | Triggers when... |
+|-------|-----------------|
 | `building-app-mockups` | Designing new UI pages as real app routes (not standalone files) |
 | `ui-state-pattern` | Building a new UI screen — Component → State → Load, swap mock↔real |
 | `semantic-styles` | Building any UI — consistent type scale, spacing, and semantic color |
 | `semantic-styles-rokkit` | Building or auditing a Rokkit-powered app — token pipeline, dark mode |
 | `tauri-screen-dev` | Building a new screen/stage in the Tauri + SvelteKit desktop app |
 | `tauri-playwright-testing` | Writing or debugging Playwright E2E tests for the Tauri app |
-| `identify-unknown-libs` | `get_lib_docs` returns empty sections — register missing library docs |
-| `knowledge-capture` | Session start (load memory) and when a capture trigger fires (correction / revert / "actually") |

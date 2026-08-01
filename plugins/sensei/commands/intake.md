@@ -21,7 +21,12 @@ the user before adopting it. Nothing is built here; this is orientation before w
      touched area — to judge blast-radius)
    Ask only what you cannot infer. One question at a time.
 3. Call `recommend_playbook(lifecycle, intent, risk, session_id=<current session>)`. It returns
-   `playbook`, `rationale`, `opening_tone`, and `auto_select` (+ `trust`).
+   `playbook`, `rationale`, `opening_tone`, and `auto_select` (+ `trust`). It may also return
+   `suggested_skills` / `suggested_agents` — the skills/review-agents provided by the libraries
+   this repo uses (e.g. "this repo uses **rokkit** → its `semantic-styles-rokkit` skill /
+   `rokkit-styles-reviewer` agent"). If present and non-empty, offer them to the user: load a
+   suggested skill with `get_library_skill(name=<library>, focus=<focus>)`, and use a suggested
+   agent during `/sensei:review`. (Keys absent = couldn't determine; empty = genuinely none.)
 4. **If `auto_select` is true:** skip the confirm — call `recommend_playbook(..., confirm="true")`
    to record the run, then tell the user: "Auto-selected **<playbook>** — reliable for this kind of
    chunk (FTR <trust.ftr> over <trust.n> runs). Say 'change' to pick a different playbook." Adopt
