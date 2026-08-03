@@ -130,7 +130,7 @@ These activate automatically from their description — you don't invoke them ma
 | Skill | Triggers when... |
 |-------|-----------------|
 | `codebase-indexing` | First working on a repo, after a major refactor, or when `llmspec.yaml` has placeholders |
-| `analyzer` | Starting on an unfamiliar repo or after significant changes — structured health check |
+| `analyzer` | Deep-analysing an objective before an automated run — grill for depth, write/extend docs, resolve conflicts (prereq for `planner`) |
 | `reverse-engineering` | Reverse-engineering a codebase into product/feature/audit docs (via `/sensei:spec`) |
 | `extract-docs` | Generating or updating documentation for a module from its code |
 | `identify-unknown-libs` | `get_lib_docs` returns empty sections — register missing library docs |

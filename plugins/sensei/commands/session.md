@@ -33,7 +33,7 @@ Call `log_event(type="command_invoked", data="{\"command\":\"session\",\"action\
 
 1. Call `get_workflow_state()`. Display: phase, task, issue, last checkpoint.
 2. Read `.sensei/rules.md`. Count the rules. Display the count.
-3. Call `get_patterns(pattern="")`. Display the pattern count.
+3. Call `get_project_conventions`. Display `patterns_total` as the pattern count. (Do NOT use `get_patterns(pattern="")` — that filters files by a pattern TAG and returns none, so it always shows 0.)
 4. Count files in each of these directories (non-recursive, ignore missing dirs):
    - `docs/ideas/`
    - `docs/analysis/`

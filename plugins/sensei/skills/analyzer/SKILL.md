@@ -4,8 +4,7 @@ description: >-
   Use for DEEP analysis of an objective before planning an automated run — grill the user for
   depth using sensei's code + doc graph lookup, write or extend docs under docs/, run a depth +
   clarity pass, detect conflicts across the docs, resolve them WITH the user, and record the
-  decisions. This is the prerequisite the `planner` skill depends on. Distinct from the
-  codebase-health-check `analyze` skill (which audits a repo's size/complexity).
+  decisions. This is the prerequisite the `planner` skill depends on.
 ---
 
 # Analyzer — depth before planning

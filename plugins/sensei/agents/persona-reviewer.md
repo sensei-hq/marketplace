@@ -40,7 +40,7 @@ When invoked:
 1. Read all personas from `.sensei/personas/*.md`
 2. If a specific persona was mentioned in the prompt, focus on that one. Otherwise review from ALL personas.
 3. Read `.sensei/rules.md` for project context
-4. Identify the work to review — recent git diff, specified files, or task description
+4. Identify the work to review — the caller-specified files or task description (this agent has no Bash, so it cannot run `git diff` itself; the caller supplies the scope)
 5. For each persona:
    a. Read their goals, pain points, and validation criteria
    b. Walk through the changed code from their perspective
