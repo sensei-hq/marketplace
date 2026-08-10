@@ -67,3 +67,6 @@ name = "trufflehog"
 
 [[plugin]]
 name = "zizmor"
+# Pinned so local CLI and Qlty Cloud run the same zizmor — an unpinned/older
+# local zizmor missed audits (e.g. artipacked) that Cloud's newer one emitted.
+version = "1.29.0"
