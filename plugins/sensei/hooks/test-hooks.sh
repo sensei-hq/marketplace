@@ -94,9 +94,11 @@ if [ -f "$fallback" ] && [ -s "$fallback" ]; then
   if command -v jq >/dev/null 2>&1; then
     family=$(printf '%s' "$last" | jq -r '.assistant_family // empty')
     event=$(printf '%s' "$last" | jq -r '.event_type // empty')
-    [ "$family" = "claude" ] && [ "$event" = "Notification" ] && \
-      assert_true "fallback row enriched with assistant_family + event_type" "true" || \
+    if [ "$family" = "claude" ] && [ "$event" = "Notification" ]; then
+      assert_true "fallback row enriched with assistant_family + event_type" "true"
+    else
       assert_true "fallback row enriched with assistant_family + event_type" "false"
+    fi
   fi
 else
   assert_true "JSONL fallback file written when daemon unreachable" "false"
