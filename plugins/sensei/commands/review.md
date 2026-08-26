@@ -68,6 +68,40 @@ Green tests that assert a fallback or a mock prove nothing — audit the tests a
    - Flag any criterion that isn't met
 3. If no personas are defined, skip this check
 
+### Check 7: Whole-slice adversarial swarm (depth **review** or **approve** only)
+
+Checks 1–6 read the diff. This one asks the question a diff cannot answer: **what did the whole
+slice get wrong that each part got right?** It is the post-implementation counterpart to the
+spec audit `/sensei:build` runs at Step 4.5.
+
+Dispatch **in parallel — one message, multiple Agent calls**, each blind to the others.
+Independence is the point; a shared draft collapses five perspectives into one:
+
+- `sensei-failure-mode-reviewer` — unbounded waits, poison pills, partial application reported as
+  success, discarded rollback/cleanup errors.
+- `sensei-data-correctness-reviewer` — re-derives every computed value rather than trusting the
+  test as an oracle. Wrong denominators, wrong keys, domain-vs-range mistakes, fabricated defaults.
+- `sensei-spec-conformance-auditor` — implementation vs every doc surface, **and** the spec itself.
+- `sensei-security-reviewer` — secrets escaping to a second sink, injection, data exposure.
+- `sensei-test-reviewer` — tests asserting the wrong property (already dispatched by Check 4; do
+  not dispatch it twice — fold its findings in here).
+
+Give each the slice range, the changed-file list, and the instruction to **read changed files in
+full from disk** — a defect introduced by a hunk usually lives outside it.
+
+Then **dedupe and triage**:
+- Same file and line within ±3, same defect → one finding at the **highest** severity claimed. Note
+  the corroboration count; two independent reviewers on one line is a strong signal, not a dup.
+- Two reviewers contradicting each other → do not average. Read the code and decide, and record why.
+- **Verify every CRITICAL and HIGH yourself before accepting it.** Adversarial reviewers produce
+  plausible-but-wrong findings. Reproduce it or trace it in source. Say which you dropped and why —
+  a dropped finding is a result, not an omission.
+- An agent returning `NO FINDINGS` contributes nothing; do not paraphrase it. An agent that errored
+  is **NOT RUN**, never a pass — name it.
+
+CRITICAL and HIGH must be fixed **red-first** (failing test observed to fail, then the fix, then
+green, then the full suite) before the slice is done. MEDIUM and LOW are reported, not fixed here.
+
 ### Report
 
 Present findings grouped by severity:

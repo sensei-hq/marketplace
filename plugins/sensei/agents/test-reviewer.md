@@ -39,6 +39,35 @@ A test only has value if it **fails when the feature regresses**. Green is not t
 - **Acceptance criteria with no failing test.** A requirement nobody would notice breaking
   because no test exercises it — or a test that exercises it but asserts nothing specific.
 - **Happy-path-only.** No error path, no boundary, no "wrong input" case.
+- **Name/assertion mismatch.** The name states property P; the body checks Q. `..._is_deduplicated`
+  asserting a count; `..._is_sorted` asserting membership. This is worse than an obvious gap: the
+  suite has a hole *labelled as covered*, so nobody looks again.
+- **Prose-pinned assertions.** Asserting the exact wording of a human-readable message as a stand-in
+  for a structural property. Breaks on harmless rewording, survives real regressions — the worst
+  possible trade. Name the structural anchor it should use instead: the count, the tag, the field,
+  the exit code. (Distinguish a *legitimate* message test, where the wording genuinely is the
+  requirement, and say which you concluded.)
+- **Vacuous on empty.** `for x in results { assert!(...) }` with zero results; `.iter().all(...)` on
+  an empty collection; a filter-then-assert with nothing to filter; an assertion inside a
+  conditional the test never guarantees is entered; a `?` or early return that exits before any
+  assertion. If the fixture can yield zero rows, the test proves nothing.
+- **Gated to nowhere.** A test that returns early when an env var is unset —
+  `let Ok(dir) = std::env::var("X_SAMPLE") else { return };` — reports `ok` while running nothing.
+  **Verify with `rg --no-ignore -g '!target'` that the variable is actually set in a Makefile, CI
+  workflow, or script.** If it is set nowhere, the test runs only on its author's machine and is
+  CRITICAL when cited as evidence that a risky change is safe.
+- **Self-confirming expectations.** Building the expected value with the same helper the
+  implementation uses, so both are wrong together; a golden/snapshot file regenerated from current
+  output, pinning behavior that was never asserted correct.
+- **A guard filed down.** A test changed in the same commit as the behavior it guards. Ask whether
+  it was corrected because the requirement changed, or *adjusted to fit* the new output.
+- **Fixture shape ≠ production shape.** The test builds its input at a different nesting depth, from
+  a different root, or through a different constructor than production uses — so it exercises the
+  *other* branch of the very code under test. Trace how production builds the input and compare.
+- **Vacuous gates.** A CI check, script, or hook that reports success when nothing ran: a piped
+  command whose exit code is the pipe's, a `grep -c FAILED` that is also 0 when compilation failed,
+  a test filter matching no tests, a conditional step that silently skips. Verify a gate the same
+  way you verify a test — name the breakage it should catch, and confirm it would.
 
 You run in an isolated context with no conversation history — your final message is the
 entire return value, so put the full test audit there.
@@ -77,9 +106,15 @@ When invoked:
    `unwrap_or(`, `.ok()`, fixture/mock names) and check no test *asserts the masked value*.
 5. **Mutation spot-check (evidence).** For the 1–3 riskiest assertions, actually break the
    production code (flip a condition, return the wrong value, short-circuit the path) and
-   run the test — confirm it FAILS. Restore the code. A test that stays green under a real
-   mutation is not testing the behavior. Paste the before/after test result.
-6. Map every acceptance criterion → the test(s) that would fail on its regression; list
+   run the test — confirm it FAILS. A test that stays green under a real mutation is not
+   testing the behavior. Paste the before/after test result.
+   **Do this in a scratch copy in a temp directory, never in the working tree** — a mutation you
+   forget to restore is a defect you introduced. `git archive HEAD | tar -x -C "$(mktemp -d)"`.
+6. **Confirm the tests actually ran.** Read the real exit code and the real test count — never
+   conclude from `cargo test | tail` or any pipe, which reports the pipe's status, not the
+   command's. Note any test reported `ok` in zero time that claims to do real I/O, and check every
+   env-gated test for whether its variable is set anywhere in the repo.
+7. Map every acceptance criterion → the test(s) that would fail on its regression; list
    uncovered criteria.
 
 ## Verification evidence (required — no assume-green)
