@@ -32,6 +32,33 @@ If the task touches a database, a browser/E2E harness, or a large native build, 
 Skip this step for a docs-only or single-pure-function task — the gate should not tax work that
 cannot trip it.
 
+### Step 0.5: Re-verify the spec's claims — MANDATORY when a spec exists
+
+Open the spec's **`## Claims`** ledger (written by `/sensei:design`) and re-run every check.
+
+This is cheap — a handful of `rg`/`psql` commands — and it closes the failure that costs the most
+here: **the spec asserts something about existing code, it is wrong, and nobody finds out until
+implementation touches reality.** Two real cases from a single session, both in specs written by
+someone who knew the code well:
+
+> *"Sign-in state lives only in the Keychain and nothing can list it."* — `sensei.personas` already
+> listed it. That claim was the entire justification for a new table.
+
+> *"`unpushed_metric_rows` is the one production push path."* — it had no production caller at all.
+> That claim set the scope of a whole slice.
+
+Neither is a reasoning error, and neither would be caught by reviewing the spec: they are good
+prose. Only running the check catches them.
+
+Claims are also **re-run here rather than trusted from design** because the repo moves. A claim
+verified three weeks ago is a claim about three weeks ago.
+
+- **Any claim now `FALSE` → stop.** The spec is standing on something untrue. Fix the spec (and
+  whatever depended on the claim) before writing code against it.
+- **No `## Claims` section →** the spec did not go through `/sensei:design`. Say so. Either run
+  that gate now or proceed explicitly at the user's direction — but never proceed silently, and
+  never invent the ledger yourself mid-build.
+
 ### Step 1: Set phase and pick the mode
 
 1. Call `update_phase(phase="build")` — MANDATORY
