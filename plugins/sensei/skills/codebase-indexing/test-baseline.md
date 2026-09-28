@@ -12,7 +12,7 @@ User says:
 
 > "I just added a new `src/adapters/python/` package with about 30 files. The existing CLAUDE.md and llmspec.yaml are out of date — they still have TODO placeholders in the concepts and patterns sections. Can you update them so future agents orient correctly?"
 
-The repo is at `/Users/Jerry/Developer/sensei`. Start now.
+The repo is at `/Users/dev/Developer/sensei`. Start now.
 
 ---
 

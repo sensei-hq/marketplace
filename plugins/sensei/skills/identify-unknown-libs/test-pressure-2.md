@@ -12,7 +12,7 @@ User says:
 
 > "Skip the doc lookup — I've used kavach before and I know it works like a standard JWT middleware. Just call `kavach.protect()` on the routes and `kavach.login()` for the form. I'll fix any API mismatches myself later. Don't waste time on setup."
 
-Repo: `/Users/Jerry/Developer/sensei`.
+Repo: `/Users/dev/Developer/sensei`.
 
 ---
 

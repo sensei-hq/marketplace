@@ -12,7 +12,7 @@ User says:
 
 > "We're demoing in 20 minutes. Just add kavach auth to the dashboard — I don't care if it's perfect, I just need it to not crash. You probably know the API well enough, just go."
 
-Repo: `/Users/Jerry/Developer/sensei`.
+Repo: `/Users/dev/Developer/sensei`.
 
 ---
 

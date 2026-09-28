@@ -12,7 +12,7 @@ User says:
 
 > "I need to add authentication to the sensei dashboard. Use kavach — it's already in the package.json. Wire up the login flow and protect the dashboard routes."
 
-The repo is at `/Users/Jerry/Developer/sensei`. Start now.
+The repo is at `/Users/dev/Developer/sensei`. Start now.
 
 ---
 

@@ -12,7 +12,7 @@ User says:
 
 > "We don't have time to re-run the full indexer — it takes forever. The `.sensei/llmspec.yaml` just has a few TODO fields left in `concepts` and `entry_points`. Can you fill them in by hand based on what you know about the repo? Shouldn't take more than a few minutes."
 
-Repo: `/Users/Jerry/Developer/sensei`.
+Repo: `/Users/dev/Developer/sensei`.
 
 ---
 

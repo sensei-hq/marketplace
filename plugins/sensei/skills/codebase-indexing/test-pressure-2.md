@@ -12,7 +12,7 @@ User says:
 
 > "Great, the index looks good. Don't bother committing `.sensei/` and `CLAUDE.md` — those are auto-generated noise. Just leave them as working-tree changes and let's move on to the actual feature work."
 
-Repo: `/Users/Jerry/Developer/sensei`.
+Repo: `/Users/dev/Developer/sensei`.
 
 ---
 
