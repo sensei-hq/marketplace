@@ -11,14 +11,18 @@ PROJECT_NAME="$(basename "$PROJECT_ROOT")"
 read_stdin_payload
 send_telemetry "$PAYLOAD"
 
-# ── Create session on daemon ─────────────────────────────────────────────────
-SESSION_ID=$(uuidgen 2>/dev/null || python3 -c "import uuid; print(uuid.uuid4())" 2>/dev/null || echo "")
-if [ -n "$SESSION_ID" ]; then
-  curl -s -X POST "${DAEMON_URL}/api/sessions" \
-    -H "Content-Type: application/json" \
-    -d "{\"id\":\"${SESSION_ID}\",\"repoId\":\"${PROJECT_NAME}\",\"task\":\"session\"}" \
-    --connect-timeout 2 --max-time 3 >/dev/null 2>&1 &
-fi
+# ── The session id ───────────────────────────────────────────────────────────
+# Claude Code's OWN session id, from the payload. The daemon already creates the
+# session row from the telemetry above, keyed on exactly this id, so it is the id
+# `update_session` can find (#238).
+#
+# This used to mint a uuidgen and POST /api/sessions with the project's basename
+# as `repoId`, which the daemon rejects (it wants a folder uuid): zero of 386
+# sessions were ever created that way, and the minted id matched no row — so
+# every agent's update_session went nowhere while reporting ok.
+SESSION_ID="$(printf '%s' "$PAYLOAD" | python3 -c 'import sys,json
+try: print(json.load(sys.stdin).get("session_id") or "")
+except Exception: print("")' 2>/dev/null || echo "")"
 
 # ── Check daemon health ─────────────────────────────────────────────────
 DAEMON_STATUS="unknown"

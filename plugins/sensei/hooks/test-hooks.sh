@@ -124,6 +124,11 @@ assert_json "injects lean mindset reminder (agents, not full dump)" "$output" \
   "import sys,json; d=json.load(sys.stdin); c=d['additional_context']; assert '/sensei:agent' in c and 'Analyst' in c and 'Acceptance Tester' in c"
 assert_json "no-rules message when file missing" "$output" \
   "import sys,json; d=json.load(sys.stdin); assert 'No rules' in d['additional_context']"
+# The id the agent is told to close its session with IS Claude Code's session id
+# — the key the session row already has. A minted uuidgen matched no row, so
+# every update_session went nowhere (#238).
+assert_json "injects the assistant's own session id, not a minted one" "$output" \
+  "import sys,json; c=json.load(sys.stdin)['additional_context']; assert 'Session ID: test-session-1' in c and 'sessionId=\"test-session-1\"' in c"
 
 printf '# Rules\n- test-rule-alpha\n' > "$TEMP_PROJECT/.sensei/rules.md"
 output=$(run_hook "session-start" "$SESSION_PAYLOAD")
@@ -230,7 +235,10 @@ wait "$FAKE_PID" 2>/dev/null || true
 assert_json "nudge:true is reshaped into hookSpecificOutput.additionalContext" "$output" \
   "import sys,json; d=json.load(sys.stdin); assert d['hookSpecificOutput']['hookEventName'] == 'PreToolUse'; assert '/sensei:intake' in d['hookSpecificOutput']['additionalContext']"
 
-# nudge:false from a reachable daemon → no-op, same as fail-open.
+# nudge:false from a reachable daemon → no-op, same as fail-open. The marker the
+# case above left for this session is cleared first, or the hook would answer
+# from it without reaching this daemon and the case would pass for nothing.
+rm -rf "$TEMP_HOME/.sensei/nudged"
 python3 -c "$FAKE_NUDGE_SERVER" '{"nudge":false}' "$FAKE_NUDGE_PORT" &
 FAKE_PID=$!
 sleep 0.3
@@ -247,6 +255,57 @@ wait "$FAKE_PID" 2>/dev/null || true
 
 assert_json "nudge:false returns no-op" "$output" \
   "import sys,json; d=json.load(sys.stdin); assert d == {}"
+
+# ONE question per session. The daemon's answer for a session cannot change once
+# given (a confirmed run stays confirmed; a nudged session stays nudged), so the
+# hook stops asking. It used to POST on every PreToolUse: 254,404 calls against
+# 536 sessions, each a blocking round-trip plus a DB query (#238).
+COUNT_SERVER='
+import http.server, sys
+count_file = sys.argv[2]
+class Handler(http.server.BaseHTTPRequestHandler):
+    def do_POST(self):
+        self.rfile.read(int(self.headers.get("Content-Length", 0)))
+        with open(count_file, "a") as f: f.write("x")
+        body = b"{\"nudge\":false}"
+        self.send_response(200); self.send_header("Content-Length", str(len(body))); self.end_headers()
+        self.wfile.write(body)
+    def log_message(self, *a): pass
+http.server.HTTPServer(("127.0.0.1", int(sys.argv[1])), Handler).serve_forever()
+'
+COUNT_FILE="$TEMP_HOME/nudge-requests"
+: > "$COUNT_FILE"
+python3 -c "$COUNT_SERVER" "$FAKE_NUDGE_PORT" "$COUNT_FILE" &
+FAKE_PID=$!
+sleep 0.3
+ONCE_PAYLOAD='{"hook_event_name":"PreToolUse","session_id":"6f0e1c2a-0000-4000-8000-000000000001","tool_name":"Bash"}'
+for _ in 1 2 3; do
+  printf '%s' "$ONCE_PAYLOAD" | HOME="$TEMP_HOME" CLAUDE_PROJECT_ROOT="$TEMP_PROJECT" \
+    CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" SENSEI_DAEMON_URL="http://127.0.0.1:${FAKE_NUDGE_PORT}" \
+    bash "$SCRIPT_DIR/nudge" >/dev/null 2>&1
+done
+kill "$FAKE_PID" 2>/dev/null || true
+wait "$FAKE_PID" 2>/dev/null || true
+assert_true "nudge asks the daemon once per session, not once per tool call" \
+  "$([ "$(wc -c < "$COUNT_FILE" | tr -d ' ')" = "1" ] && echo true || echo false)"
+
+# An outage is retried, not remembered: a call that got no answer leaves no
+# marker, so the next call — with the daemon back — still asks.
+RETRY_PAYLOAD='{"hook_event_name":"PreToolUse","session_id":"6f0e1c2a-0000-4000-8000-000000000002","tool_name":"Bash"}'
+printf '%s' "$RETRY_PAYLOAD" | HOME="$TEMP_HOME" CLAUDE_PROJECT_ROOT="$TEMP_PROJECT" \
+  CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" SENSEI_DAEMON_URL="http://127.0.0.1:1" \
+  bash "$SCRIPT_DIR/nudge" >/dev/null 2>&1
+: > "$COUNT_FILE"
+python3 -c "$COUNT_SERVER" "$FAKE_NUDGE_PORT" "$COUNT_FILE" &
+FAKE_PID=$!
+sleep 0.3
+printf '%s' "$RETRY_PAYLOAD" | HOME="$TEMP_HOME" CLAUDE_PROJECT_ROOT="$TEMP_PROJECT" \
+  CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" SENSEI_DAEMON_URL="http://127.0.0.1:${FAKE_NUDGE_PORT}" \
+  bash "$SCRIPT_DIR/nudge" >/dev/null 2>&1
+kill "$FAKE_PID" 2>/dev/null || true
+wait "$FAKE_PID" 2>/dev/null || true
+assert_true "a daemon outage is retried, not remembered as an answer" \
+  "$([ "$(wc -c < "$COUNT_FILE" | tr -d ' ')" = "1" ] && echo true || echo false)"
 
 # ── Cleanup ──────────────────────────────────────────────────────────────────
 

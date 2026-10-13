@@ -49,6 +49,24 @@ if [ -z "$PAYLOAD" ]; then
   exit 0
 fi
 
+# ONE QUESTION PER SESSION (#238). The daemon's answer for a session cannot
+# change once given — a confirmed run stays confirmed, a nudged session stays
+# nudged — so after the first definitive answer this hook stops asking. It used
+# to POST on EVERY PreToolUse: 254,404 blocking round-trips (each a DB query)
+# against 536 sessions. The daemon's own guard is in memory, so it also forgot
+# on every restart and nudged again.
+#
+# The marker is written only after an answer arrives; a failed request leaves
+# none, so a daemon outage is retried rather than remembered.
+SESSION_KEY="$(printf '%s' "$PAYLOAD" | python3 -c 'import sys,json,re
+try: print(re.sub(r"[^A-Za-z0-9-]", "", json.load(sys.stdin).get("session_id") or ""))
+except Exception: print("")' 2>/dev/null || echo "")"
+MARKER_DIR="${HOME}/.sensei/nudged"
+if [ -n "$SESSION_KEY" ] && [ -e "${MARKER_DIR}/${SESSION_KEY}" ]; then
+  echo "$NO_OP"
+  exit 0
+fi
+
 # POST to the daemon. Short timeouts — this is advisory, not gating, so it
 # should never be felt by the user.
 RESPONSE="$(curl -sS -X POST "${DAEMON_URL}/hook/nudge" \
@@ -56,10 +74,15 @@ RESPONSE="$(curl -sS -X POST "${DAEMON_URL}/hook/nudge" \
   -d "$PAYLOAD" \
   --connect-timeout 2 --max-time 5 2>/dev/null)" || RESPONSE=""
 
-# Empty response (curl failed / timed out / daemon down) → fail-open, no-op.
+# Empty response (curl failed / timed out / daemon down) → fail-open, no-op,
+# and NO marker, so the next call asks again.
 if [ -z "$RESPONSE" ]; then
   echo "$NO_OP"
   exit 0
+fi
+
+if [ -n "$SESSION_KEY" ]; then
+  mkdir -p "$MARKER_DIR" 2>/dev/null && : > "${MARKER_DIR}/${SESSION_KEY}" 2>/dev/null || true
 fi
 
 # Pull `nudge`/`message` out of the daemon's response. Prefer jq when present
