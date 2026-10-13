@@ -1,6 +1,6 @@
 {
   "name": "@sensei/marketplace",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "description": "Skills, plugins, commands, and hooks for sensei AI coding companion",
   "type": "module",
   "exports": {
