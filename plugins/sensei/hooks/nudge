@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Front-door intake nudge (front-door intake plan, Task 5) — a non-blocking
-# daemon↔agent control leg, sibling to hooks/gate.
+# daemon↔agent control leg, sibling to the relay gate (hooks/gate.ts).
 #
 # A Claude Code PreToolUse hook: reads the tool-call payload from stdin, POSTs
 # it to the sensei daemon's /hook/nudge endpoint, and reshapes the daemon's
@@ -8,12 +8,12 @@
 # the daemon's raw shape is NOT something Claude Code recognises, so printing
 # it verbatim (as an earlier version of this hook did) surfaced nothing. When
 # the daemon says `nudge:true`, this emits the message as `additionalContext`
-# (mirrors hooks/gate's `gate_decision` shaping, and session-start/pre-compact's
+# (mirrors the daemon's `gate_decision` shaping, and session-start/pre-compact's
 # `hookSpecificOutput.additionalContext` context-injection convention):
 #
 #   {"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"<message>"}}
 #
-# Unlike hooks/gate, this response is INFORMATIONAL ONLY — it never carries a
+# Unlike the relay gate, this response is INFORMATIONAL ONLY — it never carries a
 # permissionDecision and can never block a tool call. It exists to surface a
 # one-line suggestion to run `/sensei:intake` when the current session has no
 # confirmed playbook run yet (the daemon nudges at most once per session —

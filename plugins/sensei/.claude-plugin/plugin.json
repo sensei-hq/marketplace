@@ -1,6 +1,6 @@
 {
   "name": "sensei",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "AI development intelligence — mindset-driven agents, code graph, session telemetry",
   "author": {
     "name": "sensei-hq"
@@ -18,6 +18,20 @@
   "mcpServers": {
     "sensei": {
       "command": "${CLAUDE_PLUGIN_ROOT}/bin/sensei-mcp.sh"
+    }
+  },
+  "userConfig": {
+    "relayGate": {
+      "type": "boolean",
+      "title": "Relay tool gate",
+      "description": "Ask the sensei daemon before each tool call; a dōjō member can decline it from their phone. It only ever tightens a decision, and an unreachable daemon allows.",
+      "default": false
+    },
+    "runDrive": {
+      "type": "boolean",
+      "title": "Run drive",
+      "description": "Submit a dōjō member's nudges for a run this session started as prompts, each once, once the session is idle. Off: nudges stay pull-only (get_pending_nudges).",
+      "default": false
     }
   },
   "hooks": {

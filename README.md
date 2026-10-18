@@ -9,7 +9,7 @@ stack: [markdown, json]
 
 # sensei
 
-The sensei plugin for Claude Code provides a structured development workflow through 20 slash commands, 8 specialist agents, 9 auto-applied skills, and 5 lifecycle hooks. It keeps Claude grounded in your codebase's actual patterns, tracks session state across interruptions, and guides work through a deliberate idea-to-validated-feature lifecycle.
+The sensei plugin for Claude Code provides a structured development workflow through 25 slash commands, 14 specialist agents, 24 auto-applied skills, lifecycle hooks, and a mods module (Claude Code 2.1.300+). It keeps Claude grounded in your codebase's actual patterns, tracks session state across interruptions, and guides work through a deliberate idea-to-validated-feature lifecycle.
 
 The plugin communicates with the sensei daemon (MCP server) to index your codebase, track patterns, manage session state, and log events — giving Claude persistent context that survives between sessions.
 
@@ -24,6 +24,19 @@ brew install sensei-hq/tap/sensei && sensei init
 ---
 
 ## Commands
+
+### Front door and staged flow (5)
+
+Start with `/sensei:intake`. It classifies the chunk of work and recommends a playbook. The staged flow `analysis → design → build → complete` verifies every claim about existing code before build starts, and closes the loop on docs and issues at the end.
+
+| Command | What it does |
+|---|---|
+| `/sensei:intake [what you want to do]` | The front door: clarify intent, classify the chunk, and recommend-and-confirm a playbook before any work |
+| `/sensei:analysis [idea \| #issue \| problem]` | Stage 1 of 4: turn a vague ask into a grounded, scoped problem statement, read against the real codebase |
+| `/sensei:design [spec \| #issue \| slice]` | Stage 2 of 4: a spec and a plan, every claim about existing code verified before build |
+| `/sensei:build [plan \| #issue \| task]` | Stage 3: drive a registered plan graph to completion, or implement one task with TDD (detailed below) |
+| `/sensei:complete [slice \| #issue]` | Stage 4 of 4: verify the slice against reality, close the loop on docs and issues, record what was learned |
+| `/sensei:preflight [--fix \| --quick]` | Prove the environment is sane before work: disk, services, ports, runtime target, artifact freshness |
 
 ### Phase Commands (7)
 
@@ -295,16 +308,24 @@ Show all available sensei commands, agents, and usage examples.
 
 Agents are mindset-driven subagents invoked via `/sensei:agent use <name>`. Each carries a specialist perspective with its own questions, procedure, and report format.
 
-| Agent | Focus | Model | When to use |
-|---|---|---|---|
-| `analyst` | Problem analysis, requirements clarity, constraint mapping | sonnet | Before designing — when scope or requirements are unclear |
-| `developer` | Implementation review, file placement, design validation | sonnet | Before coding — to validate an implementation plan against the codebase |
-| `acceptance-tester` | End-to-end testing, acceptance criteria, regression detection | sonnet | After implementation — to verify user journeys work as intended |
-| `security-reviewer` | OWASP top 10, auth issues, data exposure, injection vectors | sonnet | When the task involves user input, authentication, or external communication |
-| `performance-engineer` | Algorithmic complexity, memory usage, network costs, scalability | sonnet | When the task involves queries, loops, data processing, or user-facing latency |
-| `ux-designer` | Usability, accessibility, consistency of user-facing interfaces | sonnet | When the task involves commands, UI components, output formatting, or messages |
-| `devops-sre` | Deployability, monitoring, rollback safety, operational readiness | sonnet | When the task involves deployment, infrastructure, configuration, or reliability |
-| `persona-reviewer` | Validates work against defined persona goals and criteria | sonnet | After implementation to confirm the work serves each persona's needs |
+| Agent | Focus | Model |
+|---|---|---|
+| `analyst` | Problem analysis before designing or building | sonnet |
+| `developer` | Verify the implementation approach before coding | sonnet |
+| `acceptance-tester` | Acceptance testing from the user's perspective | sonnet |
+| `security-reviewer` | OWASP top 10, auth, data exposure, injection | sonnet |
+| `performance-engineer` | Complexity, memory, network cost, scalability | sonnet |
+| `ux-designer` | Usability, accessibility, consistency | sonnet |
+| `devops-sre` | Deployability, monitoring, rollback safety | sonnet |
+| `persona-reviewer` | Review against each persona's goals | sonnet |
+| `plan-depth-reviewer` | Pre-flight depth gate for an autonomous run's plan | sonnet |
+| `test-reviewer` | Audits the tests against the need, not just the code | sonnet |
+| `claims-verifier` | Re-derives every claim a spec makes about existing code | inherits |
+| `data-correctness-reviewer` | Re-derives every computed value from inputs and spec | opus |
+| `failure-mode-reviewer` | Hangs, partial application, swallowed failures | opus |
+| `spec-conformance-auditor` | Diffs the implementation against every spec surface | opus |
+
+The `model:` in an agent's frontmatter is its default. With a `routing.risk_models` map configured (see *Mods* below), a spawned agent runs on the model its change's risk class maps to instead.
 
 ---
 
@@ -314,29 +335,69 @@ Skills are prompt-based enhancements that are auto-applied when their trigger co
 
 | Skill | When it applies |
 |---|---|
-| `codebase-indexing` | First session on a repo, after a major refactor, or when `llmspec.yaml` has placeholder values |
-| `analyze` | Starting work on an unfamiliar repo or after significant changes — runs a structured codebase health check |
-| `reverse-engineering` | Generating product docs, feature specs, or audit reports (used by `/sensei:spec`) |
-| `test-gen` | Adding test coverage to untested or under-tested code — finds coverage gaps and follows existing patterns |
-| `refactor` | Improving code structure without changing behavior — maps dependencies, applies targeted refactors, verifies no regressions |
-| `extract-docs` | Generating or updating documentation for a module — extracts exports and infers behavior from implementation |
-| `building-app-mockups` | Designing new UI pages or components — builds alternatives as real app routes, not standalone files |
-| `identify-unknown-libs` | When `get_lib_docs` returns empty sections — guides through registering missing library docs |
-| `ui-state-pattern` | Building a new UI screen — Component → State → Load pattern; presentation-only components, state owns changes, load swaps mock↔real |
+| `analyzer` | Deep analysis of an objective before planning an automated run |
+| `blast-radius` | Before changing a shared type, table, column or enum: enumerate every consumer first |
+| `builder` | Driving a registered automated-run plan graph to completion |
+| `building-app-mockups` | New UI: build alternatives as real app routes, not standalone files |
+| `codebase-indexing` | First session on a repo, or after a major refactor |
+| `data-reality-check` | Before declaring done: query the real state that proves the claim |
+| `dry-check` | Before writing a new function or type: search the code graph for an existing one |
+| `extract-docs` | Generating or updating documentation for a module |
+| `ground-before-scope` | Before starting from a title: read the spec and live schema, then restate the task |
+| `identify-unknown-libs` | When `get_lib_docs` returns empty sections |
+| `knowledge-capture` | Every session: load layered memory, propose and record memories |
+| `plan-depth-review` | Before an unattended run: apply the plan depth bar |
+| `planner` | Planning an automated, multi-session run |
+| `recall-canon` | Before re-opening a decision: check for a prior settled one |
+| `refactor` | Improving structure without changing behaviour |
+| `reverse-engineering` | Reverse-engineering a codebase into product docs, feature specs or an audit |
+| `semantic-styles` | Consistent styling across an application |
+| `semantic-styles-rokkit` | Rokkit token pipeline, from palettes to utility classes |
+| `tauri-playwright-testing` | E2E tests for a Tauri app with Playwright |
+| `tauri-screen-dev` | A new screen or multi-step flow in a Tauri + SvelteKit app |
+| `test-gen` | Adding coverage to untested code, following existing patterns |
+| `ui-state-pattern` | A new screen: Component → State → Load |
+| `verify-deploy` | Changes that only take effect through a built or deployed artifact |
+| `verify-outcome` | Before claiming a command worked: check the real result, not a wrapper |
 
 ---
 
 ## Hooks
 
-Hooks run automatically at lifecycle events and require no user action.
+Hooks run automatically at lifecycle events and require no user action. They are declared in the plugin manifest.
 
 | Hook | Event | What it does |
 |---|---|---|
-| `session-start` | Claude Code startup, resume, clear, or compact | Injects mindsets, rules, and personas into context; creates a session on the daemon; reports daemon health |
-| `user-prompt` | Every prompt submitted | Captures prompt context and active task/phase from state — helps track work patterns |
-| `pre-compact` | Before Claude Code compacts conversation history | Preserves session state and rules so context survives compaction |
-| `pre-tool` | Before any tool executes | Logs tool usage events to the daemon with current phase and task context |
-| `post-tool` | After any tool executes | Records tool outputs and exit codes to the daemon for session history |
+| `session-start` | Startup, resume, clear, compact | Injects session context, rules and workflow state; reports daemon health |
+| `pre-compact` | Before history is compacted | Preserves session state and rules so they survive compaction |
+| `forward` | Prompts, tool calls (before, after, failed), notifications, stop, subagent stop, session end | Sends each event to the daemon (`/hook/event`), dead-lettering to `~/.sensei/events.jsonl` when it is unreachable |
+| `nudge` | Before a tool call | Suggests `/sensei:intake` once per session when no playbook was confirmed |
+
+## Mods (Claude Code 2.1.300+)
+
+`hooks/hooks.json` names a mods module (`hooks/sensei.ts`) that runs inside Claude Code. It reaches what shell hooks cannot.
+
+| Part | What it does | Default |
+|---|---|---|
+| Usage | Reports each session's context fill, rate-limit windows and `/cost` total (`SessionMeasure`), and each turn's token counts and model (`TurnComplete`). Cost lands in `activity.sessions.list_cost_usd` (list price, not billed spend) | always on |
+| Model routing | A spawned agent with no model of its own runs on the model its change's risk class maps to, when the daemon config `routing.risk_models` is set, e.g. `{"approve":"opus","review":"sonnet","auto":"haiku"}`. No map means no override | off until configured |
+| Relay gate (`relayGate`) | Puts each tool call to the daemon's `/hook/gate`. It only ever tightens a decision (a decline denies the call) and fails open | off |
+| Run drive (`runDrive`) | Submits a run's dōjō nudges as prompts, each once, for a run this session started | off |
+
+Turn the options on in the plugin's `/config` rows, or in settings:
+
+```json
+{ "pluginConfigs": { "sensei": { "options": { "relayGate": true, "runDrive": true } } } }
+```
+
+Set the routing map on the daemon:
+
+```bash
+curl -X PUT localhost:7744/api/config -H 'Content-Type: application/json' \
+  -d '{"routing.risk_models": "{\"approve\":\"opus\",\"review\":\"sonnet\",\"auto\":\"haiku\"}"}'
+```
+
+A misspelt map is rejected with 400; an empty value clears it.
 
 ---
 
