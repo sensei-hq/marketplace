@@ -21,8 +21,7 @@
 #
 # Registered in plugin.json's PreToolUse matcher, alongside hooks/forward.
 # It never blocks, so registration order relative to forward/gate does not
-# matter. See docs/plan/2026-07-19-frontdoor-intake-plan-2-command-entry.md
-# Task 5.
+# matter. See docs/features/front-door/design.md (the non-blocking nudge hook).
 #
 # FAIL-OPEN: if the daemon is down / slow / errors / times out / returns
 # something unparseable, this prints an empty no-op response (`{}`) and exits
