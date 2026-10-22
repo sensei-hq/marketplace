@@ -48,7 +48,7 @@ fi
 
 # ── Global rules (governance plane, materialized by the daemon) ──────────────
 # ~/.sensei/rules.md holds always-on user/general rules resolved + rendered by
-# the daemon. Repository-specific rules (organization/workspace/technology) resolve live —
+# the daemon. Repository-specific rules (organization/workspace/repository) resolve live —
 # the agent calls the get_rules MCP tool.
 GLOBAL_RULES_FILE="${HOME}/.sensei/rules.md"
 GLOBAL_RULES_SECTION=""
