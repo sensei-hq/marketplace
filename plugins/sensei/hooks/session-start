@@ -3,8 +3,8 @@ set -euo pipefail
 
 source "$(dirname "$0")/_lib.sh"
 
-PROJECT_ROOT="${CLAUDE_PROJECT_ROOT:-${PWD}}"
-PROJECT_NAME="$(basename "$PROJECT_ROOT")"
+REPO_ROOT="${CLAUDE_PROJECT_ROOT:-${PWD}}"
+REPO_NAME="$(basename "$REPO_ROOT")"
 
 # Capture the SessionStart payload and forward it to the daemon. Goes first
 # so telemetry fires even if any of the context-building steps below fail.
@@ -16,7 +16,7 @@ send_telemetry "$PAYLOAD"
 # session row from the telemetry above, keyed on exactly this id, so it is the id
 # `update_session` can find (#238).
 #
-# This used to mint a uuidgen and POST /api/sessions with the project's basename
+# This used to mint a uuidgen and POST /api/sessions with the repository's basename
 # as `repoId`, which the daemon rejects (it wants a folder uuid): zero of 386
 # sessions were ever created that way, and the minted id matched no row — so
 # every agent's update_session went nowhere while reporting ok.
@@ -33,22 +33,22 @@ else
 fi
 
 # ── Read rules ──────────────────────────────────────────────────────────
-RULES_FILE="${PROJECT_ROOT}/.sensei/rules.md"
+RULES_FILE="${REPO_ROOT}/.sensei/rules.md"
 RULES_SECTION=""
 if [ -f "$RULES_FILE" ]; then
-  RULES_SECTION="## Project Guardrails (from .sensei/rules.md)
+  RULES_SECTION="## Repository Guardrails (from .sensei/rules.md)
 
 $(cat "$RULES_FILE" | sed '/^---$/,/^---$/d' | head -80)
 
 Run /sensei:rules to view, add, or reload rules."
 else
-  RULES_SECTION="## Project Guardrails
+  RULES_SECTION="## Repository Guardrails
 No rules file found. Run /sensei:rules to create one."
 fi
 
 # ── Global rules (governance plane, materialized by the daemon) ──────────────
 # ~/.sensei/rules.md holds always-on user/general rules resolved + rendered by
-# the daemon. Repository-specific rules (org/project/technology) resolve live —
+# the daemon. Repository-specific rules (organization/workspace/technology) resolve live —
 # the agent calls the get_rules MCP tool.
 GLOBAL_RULES_FILE="${HOME}/.sensei/rules.md"
 GLOBAL_RULES_SECTION=""
@@ -67,7 +67,7 @@ fi
 # isn't indexed (JSON error — skip anything starting with '{'), or none resolve.
 REPO_RULES_SECTION=""
 REPO_RULES=$(curl -s --connect-timeout 1 --max-time 3 \
-  "${DAEMON_URL}/api/knowledge/rules?folder=${PROJECT_ROOT}&format=md&tiers=mandatory,required" 2>/dev/null || true)
+  "${DAEMON_URL}/api/knowledge/rules?folder=${REPO_ROOT}&format=md&tiers=mandatory,required" 2>/dev/null || true)
 if [ -n "$REPO_RULES" ] && [ "${REPO_RULES:0:1}" != "{" ]; then
   REPO_RULES_SECTION="## Repository Rules — pushed (mandatory + required)
 ${REPO_RULES}
@@ -82,7 +82,7 @@ MINDSETS_SECTION="## Mindsets
 Apply the core three in sequence: Analyst → Developer → Acceptance Tester. Add specialists (DevOps/SRE, Performance, Security, UX) when the domain applies. Each mindset is a subagent — run \`/sensei:agent <name>\` (e.g. \`/sensei:agent analyst\`) to do focused work wearing that hat."
 
 # ── Read personas ────────────────────────────────────────────────────────────
-PERSONAS_DIR="${PROJECT_ROOT}/.sensei/personas"
+PERSONAS_DIR="${REPO_ROOT}/.sensei/personas"
 PERSONAS_SECTION=""
 if [ -d "$PERSONAS_DIR" ] && ls "$PERSONAS_DIR"/*.md >/dev/null 2>&1; then
   PERSONA_SUMMARIES=""
@@ -96,7 +96,7 @@ if [ -d "$PERSONAS_DIR" ] && ls "$PERSONAS_DIR"/*.md >/dev/null 2>&1; then
   Validates:
 ${PVALIDATES}"
   done
-  PERSONAS_SECTION="## Project Personas (from .sensei/personas/)
+  PERSONAS_SECTION="## Personas (from .sensei/personas/)
 ${PERSONA_SUMMARIES}
 
 When validating work, consider each persona's goals and validates criteria."
@@ -106,10 +106,10 @@ fi
 # Fetch the resolved workflow state as pre-formatted markdown and inject it, the
 # same way repo rules are pushed above. No local .sensei/state.yaml mirror (it
 # drifted and injected a stale phase/issue). Silent no-op when the daemon is
-# down, the project is unknown, or nothing is set (skip a JSON error body).
+# down, the repository is unknown, or nothing is set (skip a JSON error body).
 STATE_SECTION=""
 STATE_BODY=$(curl -s --connect-timeout 1 --max-time 3 \
-  "${DAEMON_URL}/api/state/${PROJECT_NAME}?format=md" 2>/dev/null || true)
+  "${DAEMON_URL}/api/state/${REPO_NAME}?format=md" 2>/dev/null || true)
 if [ -n "$STATE_BODY" ] && [ "${STATE_BODY:0:1}" != "{" ]; then
   STATE_SECTION="## Workflow State
 ${STATE_BODY}
@@ -120,8 +120,8 @@ fi
 
 CONTEXT="<sensei-session>
 Session ID: ${SESSION_ID}
-Project: ${PROJECT_NAME}
-Path: ${PROJECT_ROOT}
+Repository: ${REPO_NAME}
+Path: ${REPO_ROOT}
 Daemon: ${DAEMON_STATUS}
 
 ${STATE_SECTION}
@@ -143,11 +143,11 @@ You MUST use sensei MCP tools instead of grep/glob for code navigation — they 
 **Before implementing any change, call (in order):**
 - \`get_rules()\` — governance rules for this repo (mandatory rules are non-negotiable). Check FIRST.
 - \`get_patterns(pattern)\` — existing architectural patterns (hook, middleware, route, component, adapter). Don't implement without checking.
-- \`get_project_conventions()\` — naming/structure conventions + outliers; match the house style.
-- \`get_project_summary()\` — codebase structure, libs, stack.
+- \`get_workspace_conventions()\` — naming/structure conventions + outliers; match the house style.
+- \`get_workspace_summary()\` — codebase structure, libs, stack.
 
 **Find code (use instead of grep/glob — populated and reliable):**
-- \`search(query, project?)\` — find functions/types by name or concept (replaces grep for symbol search).
+- \`search(query, workspace?)\` — find functions/types by name or concept (replaces grep for symbol search).
 - \`get_callers(name)\` / \`get_callees(name)\` — caller/callee tracing over the indexed call graph.
 - \`get_duplicates(min_similarity?)\` — near-duplicate functions; reuse before adding.
 - \`get_communities()\` — code architecture clusters.

@@ -11,7 +11,7 @@ Structured ideation. The AI asks questions to understand the problem before prop
 
 1. Call `update_phase(phase="ideate")` — MANDATORY
 2. Call `log_event(type="command_invoked", data="{\"command\":\"idea\",\"args\":\"$ARGUMENTS\"}")` — MANDATORY
-3. Read `.sensei/rules.md` if it exists — follow project rules
+3. Read `.sensei/rules.md` if it exists — follow repository rules
 4. If $ARGUMENTS is provided, use it as the starting point. If empty, ask: "What concept do you want to explore?"
 5. Ask 2-3 clarifying questions (not all at once — conversational):
    - What problem does this solve?

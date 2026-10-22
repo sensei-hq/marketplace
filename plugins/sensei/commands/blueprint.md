@@ -11,7 +11,7 @@ High-level architecture from a chosen approach. Defines components, their interf
 
 1. Call `update_phase(phase="blueprint")` — MANDATORY
 2. Call `log_event(type="command_invoked", data="{\"command\":\"blueprint\",\"args\":\"$ARGUMENTS\"}")` — MANDATORY
-3. Read `.sensei/rules.md` if it exists — follow project rules
+3. Read `.sensei/rules.md` if it exists — follow repository rules
 4. Find the relevant analysis doc:
    - If $ARGUMENTS names a specific analysis, look for it in `docs/analysis/`
    - If empty, list files in `docs/analysis/` and ask which to blueprint

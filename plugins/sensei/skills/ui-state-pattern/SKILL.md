@@ -88,7 +88,7 @@ export function loadDashboard(): DashboardData {
 
 // later — swap the body to real; signature and callers unchanged
 export async function loadDashboard(): Promise<DashboardData> {
-  const raw = await senseiApi().getMetrics(projectId);
+  const raw = await senseiApi().getMetrics(workspaceId);
   return transformMetrics(raw);     // map API shape → UI types
 }
 ```

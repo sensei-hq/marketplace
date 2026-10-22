@@ -1,11 +1,11 @@
 ---
-description: List, add, or switch project personas — role-play users to validate design decisions
+description: List, add, or switch repository personas — role-play users to validate design decisions
 argument-hint: Optional action (e.g. "list", "add end-user", "switch admin")
 ---
 
 ## What this command does
 
-Manages project-specific personas in `.sensei/personas/`. Each persona is a markdown file with frontmatter (goals, pain points, validates) and freeform content (journey maps, examples, frustrations).
+Manages repository-specific personas in `.sensei/personas/`. Each persona is a markdown file with frontmatter (goals, pain points, validates) and freeform content (journey maps, examples, frustrations).
 
 ## Procedure
 
@@ -74,5 +74,5 @@ Freeform content: journey maps, examples, scenarios, acceptance stories.
 - Personas supplement mindsets, they don't replace them
 - Core mindsets (analyst, developer, acceptance tester) apply to every task
 - Specialist mindsets (UX, security, performance, DevOps) apply by domain
-- Personas add project-specific user perspectives on top
+- Personas add repository-specific user perspectives on top
 - When validating, consider each persona independently — what's fine for a developer may confuse an end-user

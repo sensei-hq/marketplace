@@ -1,6 +1,6 @@
 ---
 organization: Sensei HQ
-project: sensei
+workspace: sensei
 role: marketplace
 tagline: Sensei plugin for Claude Code
 summary: Slash commands, specialist agents, auto-applied skills, and lifecycle hooks that keep the AI assistant grounded in your codebase's patterns and session state.
@@ -151,7 +151,7 @@ Quality check across multiple dimensions: pattern conformance, duplicate detecti
 
 #### `/sensei:persona [action]`
 
-Manage project personas in `.sensei/personas/`. Each persona has goals, pain points, and validation criteria. Use personas to role-play users and validate design decisions.
+Manage repository personas in `.sensei/personas/`. Each persona has goals, pain points, and validation criteria. Use personas to role-play users and validate design decisions.
 
 | Sub-action | What it does |
 |---|---|
@@ -230,7 +230,7 @@ Reverse-engineer structured documentation from the codebase.
 
 #### `/sensei:rules [rule to add]`
 
-View and manage `.sensei/rules.md` — enforceable constraints about how to build in this project. With no argument, displays a compact summary grouped by section. With an argument, adds a new rule interactively.
+View and manage `.sensei/rules.md` — enforceable constraints about how to build in this repository. With no argument, displays a compact summary grouped by section. With an argument, adds a new rule interactively.
 
 ```
 /sensei:rules
@@ -241,7 +241,7 @@ View and manage `.sensei/rules.md` — enforceable constraints about how to buil
 
 #### `/sensei:patterns [query]`
 
-Show detected design patterns, naming conventions, directory patterns, and project conventions from the sensei index. Optionally match a task description to applicable patterns.
+Show detected design patterns, naming conventions, directory patterns, and workspace conventions from the sensei index. Optionally match a task description to applicable patterns.
 
 ```
 /sensei:patterns

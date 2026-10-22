@@ -32,7 +32,7 @@ Display this table:
 | `sensei-performance-engineer` | Performance analysis — complexity, memory, network costs, scalability limits | When a task involves data processing, queries, loops, or user-facing latency |
 | `sensei-ux-designer` | UX review — usability, accessibility, consistency of user-facing surfaces | When a task involves commands, UI components, output formatting, or user-facing messages |
 | `sensei-devops-sre` | Ops readiness — deployability, monitoring, rollback safety, failure modes | When a task involves deployment, infrastructure, configuration, or reliability-sensitive changes |
-| `sensei-persona-reviewer` | Persona validation — review work from each defined project persona's perspective | After implementation to validate that the work serves each persona's goals and criteria |
+| `sensei-persona-reviewer` | Persona validation — review work from each defined persona's perspective | After implementation to validate that the work serves each persona's goals and criteria |
 
 Usage:
 

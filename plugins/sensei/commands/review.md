@@ -55,7 +55,7 @@ The gate that decides *how hard* to review, so rigor lands on the changes that m
 ### Check 1: Pattern conformance
 
 1. Get modified files from `git diff --name-only` (or all files if scope is "all")
-2. Call `match_pattern()` to get all detected patterns for the project
+2. Call `match_pattern()` to get all detected patterns for the workspace
 3. For each modified file containing classes/types:
    - Call `get_pattern_for(symbol)` for key symbols
    - If symbol belongs to a pattern: verify it follows the pattern's conventions
@@ -69,9 +69,9 @@ The gate that decides *how hard* to review, so rigor lands on the changes that m
 3. For each NET-NEW function/type, confirm a `dry-check` was done — the author searched (`search`/`get_duplicates`/`get_callers`) for an existing implementation before writing it. An unsearched net-new function that overlaps existing code is a finding.
 4. Log findings — MANDATORY
 
-### Check 3: Project conventions
+### Check 3: Workspace conventions
 
-1. Call `get_project_conventions()` — returns naming patterns, directory conventions, design patterns
+1. Call `get_workspace_conventions()` — returns naming patterns, directory conventions, design patterns
 2. Check if modified code follows established conventions
 3. Flag deviations
 

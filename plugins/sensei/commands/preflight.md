@@ -18,7 +18,7 @@ Run it before `/sensei:build` on anything touching a database, a browser, or a l
 
 1. Call `log_event(type="command_invoked", data="{\"command\":\"preflight\"}")` — MANDATORY.
    Preflight is cross-cutting — do NOT change the workflow phase.
-2. Read `.sensei/rules.md` — a project may declare its own required services and ports.
+2. Read `.sensei/rules.md` — a repository may declare its own required services and ports.
 
 ### Step 1: Fan out, in parallel
 
@@ -42,7 +42,7 @@ listening socket proves little more. Send a real request and read the real respo
 round-trip for every other declared dependency. A backend that accepts a connection and returns 503
 is a FAIL, not a pass.
 
-**Probe C — Port conflicts.** Enumerate the ports the project declares (scan `docker-compose*.y*ml`,
+**Probe C — Port conflicts.** Enumerate the ports the repository declares (scan `docker-compose*.y*ml`,
 `supabase/config.toml`, `.env*`, `Makefile`, `vite.config.*`, daemon config). For each, run
 `lsof -nP -iTCP:<port> -sTCP:LISTEN` and identify the owning **pid and working directory**.
 Two or three stacks of the same tool fighting over one port → HARD FAIL, naming every pid and cwd

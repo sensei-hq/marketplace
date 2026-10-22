@@ -5,12 +5,12 @@ description: Use throughout every session to load sensei's layered memory contex
 
 # Knowledge Capture
 
-Sensei's knowledge plane stores reusable lessons (memories) at global, project, and stack scopes. This skill tells you when and how to use them.
+Sensei's knowledge plane stores reusable lessons (memories) at global, workspace, and stack scopes. This skill tells you when and how to use them.
 
 ## At session start (and on /recall)
 
-1. Determine the current project. The MCP layer resolves it from your working directory; you usually don't need to pass `project_id` explicitly.
-2. Call `get_layered_context`. The response is the blended set of active memories from global + project + stack-matched scopes, ordered by strength.
+1. Determine the current workspace. The MCP layer resolves it from your working directory; you usually don't need to pass `workspace_id` explicitly.
+2. Call `get_layered_context`. The response is the blended set of active memories from global + workspace + stack-matched scopes, ordered by strength.
 3. Treat the returned memories as authoritative for this session — they are the user's accumulated decisions and conventions.
 
 Re-fetch when 60 minutes have passed or when the user explicitly issues `/recall`.
@@ -30,7 +30,7 @@ Sensei expects you to capture learnings as proposals first (triage queue), not d
 
 Required fields when calling `propose_memory`:
 
-- `scope`: one of `global`, `project`, `stack`
+- `scope`: one of `global`, `workspace`, `stack`
 - `scope_filter`: required when `scope=stack` (e.g. `rust`)
 - `type`: memory category (`convention`, `pattern`, `decision`, `preference`, `continuity`, `question`)
 - `title`: one-line summary
@@ -41,7 +41,7 @@ Optional:
 
 - `impact`: what breaks if ignored
 - `tags`: comma-separated array (`security`, `performance`, `compliance`, etc.)
-- `project_id`: only when scope=project AND the daemon hasn't resolved the project from cwd
+- `workspace_id`: only when scope=workspace AND the daemon hasn't resolved the workspace from cwd
 
 Do NOT propose memories outside the trigger list. Routine "I noticed you prefer X" observations belong in a `consulted` outcome, not a proposal.
 
@@ -70,7 +70,7 @@ The daemon's trigger updates each memory's `strength`, `reinforced_count`, `viol
 
 ## When to call `save_memory`
 
-ONLY on explicit user instruction (`/save`, "save this as a project memory", "remember that we...", etc.). A `save_memory` call writes directly to active state — no triage. Never use it on heuristic detection — that's what `propose_memory` is for.
+ONLY on explicit user instruction (`/save`, "save this as a workspace memory", "remember that we...", etc.). A `save_memory` call writes directly to active state — no triage. Never use it on heuristic detection — that's what `propose_memory` is for.
 
 Same fields as `propose_memory` minus `triage_signal`.
 

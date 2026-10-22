@@ -18,12 +18,12 @@ unresolved contradictions.
 Use sensei's graph — never guess:
 - `search(query)` — find the functions/types/modules the objective touches.
 - `get_callers(name)` / `get_callees(name)` — trace how a change ripples.
-- `get_patterns(pattern)` / `get_project_conventions()` — the house patterns to follow.
-- `get_project_summary()` — stack + structure.
+- `get_patterns(pattern)` / `get_workspace_conventions()` — the house patterns to follow.
+- `get_workspace_summary()` — stack + structure.
 - `get_lib_docs(name)` / `search_lib_docs(query)` — library specifics before you assume an API.
 - Every result carries a file path — **Read the file** when you need the real detail.
 
-Read `docs/backlog.md` first (project rule) and any existing design/analysis/decisions docs for
+Read `docs/backlog.md` first (repository rule) and any existing design/analysis/decisions docs for
 this area, so you extend rather than contradict.
 
 ## 2. Grill the user for depth

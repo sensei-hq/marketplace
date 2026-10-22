@@ -52,7 +52,7 @@ Before finalising each doc:
 
 ### Step 5 — Record coverage
 ```
-call: propose_memory(scope="project", type="decision", title="Documented: <module name>", content="<N> exports documented; coverage complete as of <date>", triage_signal="docs_extracted")
+call: propose_memory(scope="workspace", type="decision", title="Documented: <module name>", content="<N> exports documented; coverage complete as of <date>", triage_signal="docs_extracted")
 ```
 
 ## Documentation Anti-patterns

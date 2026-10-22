@@ -90,7 +90,7 @@ entire return value, so put the full test audit there.
 **Navigate with sensei MCP tools, not blind grep.** For structure and relationships prefer
 `search` (find the function under test + its tests), `get_callers`/`get_callees` (what the
 code actually does and who depends on it), `get_layered_context` (the acceptance criteria /
-rules the tests should satisfy), `get_project_summary`. `Grep`/`Glob` stay appropriate for
+rules the tests should satisfy), `get_workspace_summary`. `Grep`/`Glob` stay appropriate for
 literal scans (finding `assert`, `unwrap_or`, `mock`, fixture names) and as a fallback when
 the daemon is unreachable — say so if you fall back.
 

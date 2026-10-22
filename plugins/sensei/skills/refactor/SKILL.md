@@ -56,7 +56,7 @@ After each refactor:
 
 ### Step 5 — Record and checkpoint
 ```
-call: propose_memory(scope="project", type="pattern", title="Refactor: <what changed>", content="<approach used>", triage_signal="repeat_pattern")
+call: propose_memory(scope="workspace", type="pattern", title="Refactor: <what changed>", content="<approach used>", triage_signal="repeat_pattern")
 call: log_event(type="checkpoint", data="{\"summary\":\"Refactored <N> functions in <module>\"}")
 ```
 

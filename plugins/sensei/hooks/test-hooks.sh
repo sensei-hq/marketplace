@@ -12,11 +12,11 @@ PLUGIN_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 PASS=0
 FAIL=0
 
-# Tmpdir doubles as $HOME (so JSONL fallback lands here) and project root
+# Tmpdir doubles as $HOME (so JSONL fallback lands here) and repository root
 # (so session-start / pre-compact read empty rules/state).
 TEMP_HOME=$(mktemp -d)
-TEMP_PROJECT="$TEMP_HOME/project"
-mkdir -p "$TEMP_PROJECT/.sensei"
+TEMP_REPO="$TEMP_HOME/repo"
+mkdir -p "$TEMP_REPO/.sensei"
 
 # Point telemetry at a port that nothing is listening on. send_telemetry
 # forks into the background, so we sleep briefly after each invocation to
@@ -30,12 +30,12 @@ run_hook() {
   if [ -n "$stdin_payload" ]; then
     printf '%s' "$stdin_payload" | \
       HOME="$TEMP_HOME" \
-      CLAUDE_PROJECT_ROOT="$TEMP_PROJECT" \
+      CLAUDE_PROJECT_ROOT="$TEMP_REPO" \
       CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" \
       bash "$SCRIPT_DIR/$hook" 2>/dev/null
   else
     HOME="$TEMP_HOME" \
-      CLAUDE_PROJECT_ROOT="$TEMP_PROJECT" \
+      CLAUDE_PROJECT_ROOT="$TEMP_REPO" \
       CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" \
       bash "$SCRIPT_DIR/$hook" </dev/null 2>/dev/null
   fi
@@ -130,12 +130,12 @@ assert_json "no-rules message when file missing" "$output" \
 assert_json "injects the assistant's own session id, not a minted one" "$output" \
   "import sys,json; c=json.load(sys.stdin)['additional_context']; assert 'Session ID: test-session-1' in c and 'sessionId=\"test-session-1\"' in c"
 
-printf '# Rules\n- test-rule-alpha\n' > "$TEMP_PROJECT/.sensei/rules.md"
+printf '# Rules\n- test-rule-alpha\n' > "$TEMP_REPO/.sensei/rules.md"
 output=$(run_hook "session-start" "$SESSION_PAYLOAD")
 assert_json "loads rules when present" "$output" \
   "import sys,json; d=json.load(sys.stdin); assert 'test-rule-alpha' in d['additional_context']"
 
-# Workflow state now comes from the daemon (GET /api/state/{project}?format=md),
+# Workflow state now comes from the daemon (GET /api/state/{workspace}?format=md),
 # not a .sensei/state.yaml file — the formatting is covered by the senseid
 # `workflow_state_md` unit test; nothing to seed here.
 
@@ -146,7 +146,7 @@ if [ -s "$fallback" ]; then
 else
   assert_true "session-start emits telemetry to fallback" "false"
 fi
-rm -f "$fallback" "$TEMP_PROJECT/.sensei/rules.md"
+rm -f "$fallback" "$TEMP_REPO/.sensei/rules.md"
 
 # ── pre-compact: telemetry + context injection ───────────────────────────────
 
@@ -161,9 +161,9 @@ assert_json "returns JSON with additional_context" "$output" \
 assert_json "suggests session refocus" "$output" \
   "import sys,json; d=json.load(sys.stdin); assert '/sensei:session refocus' in d['additional_context']"
 assert_json "no-rules message when missing" "$output" \
-  "import sys,json; d=json.load(sys.stdin); assert 'No project rules' in d['additional_context']"
+  "import sys,json; d=json.load(sys.stdin); assert 'No repository rules' in d['additional_context']"
 
-printf '# Rules\n- test-rule-beta\n' > "$TEMP_PROJECT/.sensei/rules.md"
+printf '# Rules\n- test-rule-beta\n' > "$TEMP_REPO/.sensei/rules.md"
 output=$(run_hook "pre-compact" "$PRECOMPACT_PAYLOAD")
 assert_json "loads rules when present" "$output" \
   "import sys,json; d=json.load(sys.stdin); assert 'test-rule-beta' in d['additional_context']"
@@ -224,7 +224,7 @@ sleep 0.3
 
 output=$(printf '%s' "$NUDGE_PAYLOAD" | \
   HOME="$TEMP_HOME" \
-  CLAUDE_PROJECT_ROOT="$TEMP_PROJECT" \
+  CLAUDE_PROJECT_ROOT="$TEMP_REPO" \
   CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" \
   SENSEI_DAEMON_URL="http://127.0.0.1:${FAKE_NUDGE_PORT}" \
   bash "$SCRIPT_DIR/nudge" 2>/dev/null)
@@ -245,7 +245,7 @@ sleep 0.3
 
 output=$(printf '%s' "$NUDGE_PAYLOAD" | \
   HOME="$TEMP_HOME" \
-  CLAUDE_PROJECT_ROOT="$TEMP_PROJECT" \
+  CLAUDE_PROJECT_ROOT="$TEMP_REPO" \
   CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" \
   SENSEI_DAEMON_URL="http://127.0.0.1:${FAKE_NUDGE_PORT}" \
   bash "$SCRIPT_DIR/nudge" 2>/dev/null)
@@ -280,7 +280,7 @@ FAKE_PID=$!
 sleep 0.3
 ONCE_PAYLOAD='{"hook_event_name":"PreToolUse","session_id":"6f0e1c2a-0000-4000-8000-000000000001","tool_name":"Bash"}'
 for _ in 1 2 3; do
-  printf '%s' "$ONCE_PAYLOAD" | HOME="$TEMP_HOME" CLAUDE_PROJECT_ROOT="$TEMP_PROJECT" \
+  printf '%s' "$ONCE_PAYLOAD" | HOME="$TEMP_HOME" CLAUDE_PROJECT_ROOT="$TEMP_REPO" \
     CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" SENSEI_DAEMON_URL="http://127.0.0.1:${FAKE_NUDGE_PORT}" \
     bash "$SCRIPT_DIR/nudge" >/dev/null 2>&1
 done
@@ -292,14 +292,14 @@ assert_true "nudge asks the daemon once per session, not once per tool call" \
 # An outage is retried, not remembered: a call that got no answer leaves no
 # marker, so the next call — with the daemon back — still asks.
 RETRY_PAYLOAD='{"hook_event_name":"PreToolUse","session_id":"6f0e1c2a-0000-4000-8000-000000000002","tool_name":"Bash"}'
-printf '%s' "$RETRY_PAYLOAD" | HOME="$TEMP_HOME" CLAUDE_PROJECT_ROOT="$TEMP_PROJECT" \
+printf '%s' "$RETRY_PAYLOAD" | HOME="$TEMP_HOME" CLAUDE_PROJECT_ROOT="$TEMP_REPO" \
   CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" SENSEI_DAEMON_URL="http://127.0.0.1:1" \
   bash "$SCRIPT_DIR/nudge" >/dev/null 2>&1
 : > "$COUNT_FILE"
 python3 -c "$COUNT_SERVER" "$FAKE_NUDGE_PORT" "$COUNT_FILE" &
 FAKE_PID=$!
 sleep 0.3
-printf '%s' "$RETRY_PAYLOAD" | HOME="$TEMP_HOME" CLAUDE_PROJECT_ROOT="$TEMP_PROJECT" \
+printf '%s' "$RETRY_PAYLOAD" | HOME="$TEMP_HOME" CLAUDE_PROJECT_ROOT="$TEMP_REPO" \
   CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" SENSEI_DAEMON_URL="http://127.0.0.1:${FAKE_NUDGE_PORT}" \
   bash "$SCRIPT_DIR/nudge" >/dev/null 2>&1
 kill "$FAKE_PID" 2>/dev/null || true

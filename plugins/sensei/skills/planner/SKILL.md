@@ -104,7 +104,7 @@ register_plan(
                  {\"title\":\"Daemon\",\"tasks\":[
                    {\"id\":\"t2\",\"title\":\"handler\",\"agent\":\"general-purpose\",
                     \"model\":\"opus\",\"spec_ref\":\"…\",\"deps\":[\"t1\"]}]}]}",
-  project  = "<name-or-uuid, defaults to the current repo>",
+  workspace = "<name-or-uuid, defaults to the current workspace>",
   plan_ref = "docs/plan/<plan-id>/plan.md"
 )
 ```

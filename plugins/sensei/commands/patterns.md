@@ -1,11 +1,11 @@
 ---
-description: Show detected patterns, project conventions, and match patterns for a task
+description: Show detected patterns, workspace conventions, and match patterns for a task
 argument-hint: Optional query (e.g. "adapter", "what pattern for API routes")
 ---
 
 ## What this command does
 
-Pattern introspection — shows all detected patterns, naming conventions, directory patterns, and project conventions. Can match a specific task to applicable patterns.
+Pattern introspection — shows all detected patterns, naming conventions, directory patterns, and workspace conventions. Can match a specific task to applicable patterns.
 
 ## Procedure
 
@@ -14,7 +14,7 @@ Pattern introspection — shows all detected patterns, naming conventions, direc
 ### If no $ARGUMENTS — show full catalog:
 
 2. Call `match_pattern(description="")` to get all detected design patterns
-3. Call `get_project_conventions()` to get naming, directory, and usage conventions
+3. Call `get_workspace_conventions()` to get naming, directory, and usage conventions
 4. Display grouped by category:
 
    **Design patterns:**
@@ -30,7 +30,7 @@ Pattern introspection — shows all detected patterns, naming conventions, direc
    - handlers/ (4 files): request handler modules
 
    **Conventions:**
-   - [summary from get_project_conventions]
+   - [summary from get_workspace_conventions]
 
 ### If $ARGUMENTS provided — match to task:
 

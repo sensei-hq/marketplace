@@ -1,5 +1,5 @@
 {
-  "version": "0.16.0",
+  "version": "0.17.0",
   "items": [
     {
       "name": "verify-outcome",
@@ -267,7 +267,7 @@
     {
       "name": "persona",
       "kind": "command",
-      "description": "List, add, or switch project personas — role-play users to validate design decisions",
+      "description": "List, add, or switch repository personas — role-play users to validate design decisions",
       "scope": "project",
       "recommended_for": ["all"],
       "stage": ["active"],
@@ -276,7 +276,7 @@
     {
       "name": "rules",
       "kind": "command",
-      "description": "View, create, or add project rules — enforceable patterns, quality, and process constraints",
+      "description": "View, create, or add repository rules — enforceable patterns, quality, and process constraints",
       "scope": "project",
       "recommended_for": ["all"],
       "stage": ["active"],
@@ -285,7 +285,7 @@
     {
       "name": "patterns",
       "kind": "command",
-      "description": "Show detected patterns, project conventions, and match patterns for a task",
+      "description": "Show detected patterns, workspace conventions, and match patterns for a task",
       "scope": "project",
       "recommended_for": ["all"],
       "stage": ["active"],
@@ -447,7 +447,7 @@
     {
       "name": "session-start",
       "kind": "hook",
-      "description": "Inject mindsets, rules, personas, and project context on session startup",
+      "description": "Inject mindsets, rules, personas, and repository context on session startup",
       "scope": "global",
       "recommended_for": ["all"],
       "stage": ["active"],

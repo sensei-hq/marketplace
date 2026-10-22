@@ -63,10 +63,10 @@ verified three weeks ago is a claim about three weeks ago.
 
 1. Call `update_phase(phase="build")` — MANDATORY
 2. Call `log_event(type="command_invoked", data="{\"command\":\"build\",\"args\":\"$ARGUMENTS\"}")` — MANDATORY
-3. Read `.sensei/rules.md` — follow all project rules
+3. Read `.sensei/rules.md` — follow all repository rules
 4. **Pick the mode:**
    - $ARGUMENTS names a plan id/folder (`docs/plan/<id>/`), **or** a registered run exists for this
-     project (`run_status`) and no specific issue was given → **Plan-drive mode** (Step 2A).
+     workspace (`run_status`) and no specific issue was given → **Plan-drive mode** (Step 2A).
    - $ARGUMENTS is an issue (`#42`) or a task description → **Single-task mode** (Step 2B).
    - $ARGUMENTS is empty and there's no registered run → `gh issue list --state open --limit 5
      --json number,title,labels`, ask the user which to work on, then Single-task mode.

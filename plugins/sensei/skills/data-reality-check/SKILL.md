@@ -13,8 +13,8 @@ data the code path never touched. Prove the claim against reality before saying 
 
 ## Procedure
 
-1. **State the observable claim.** "The projects screen shows the user's projects." "The old
-   transcripts resolve to the current project." Make it a thing you can query.
+1. **State the observable claim.** "The workspaces screen shows the user's workspaces." "The old
+   transcripts resolve to the current workspace." Make it a thing you can query.
 2. **Query the live state that would prove or disprove it** — the actual rows/counts, the
    deployed endpoint's response, the file on disk. Not the fixture, not the mock, not the
    code that *should* produce it.

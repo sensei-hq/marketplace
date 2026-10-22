@@ -3,12 +3,19 @@ import { type Engine, describe, expect, mock, test } from 'claude-code/testing'
 
 const SESSION = 'sess-238-gate'
 const GATED = { options: { relayGate: true } }
+const DRIVEN = { options: { relayGate: true, runDrive: true } }
 
 type Verdict = 'allow' | 'ask' | 'deny'
 
 // The engine's own verdict beneath the plugin, and the daemon's /hook/gate.
-const engine = (on: On, verdict: Verdict, gate: { decision: string; reason: string } | 'down') => {
-  mock.env(on, { HOME: '/Users/dev' })
+const engine = (
+  on: On,
+  verdict: Verdict,
+  gate: { decision: string; reason: string } | 'down',
+  env: Record<string, string> = {},
+) => {
+  mock.env(on, { HOME: '/Users/dev', ...env })
+  mock.store(on)
   mock.clock(on, { now: 1_760_000_000_000 })
   on('session.id', () => ({ value: SESSION }))
   on('session.root', () => ({ value: '/Users/dev/repo' }))
@@ -60,6 +67,7 @@ describe('relay tool gate (#238 step 5)', () => {
         tool_input: { command: 'git push origin main' },
         tool_use_id: 'toolu_gate',
         cwd: '/Users/dev/repo',
+        unattended: false,
       },
     ])
   })
@@ -88,5 +96,38 @@ describe('relay tool gate (#238 step 5)', () => {
 
     expect((await check($, null)).decision).toBe('allow')
     expect(asked).toHaveLength(0)
+  })
+})
+
+describe('unattended runs (#312, D28)', () => {
+  test('a step the daemon spawned says it is unattended', GATED, async ($, on) => {
+    const asked = engine(on, 'allow', { decision: 'allow', reason: 'not gated' }, { SENSEI_RUN_ID: 'run-7' })
+
+    await check($)
+
+    expect(asked[0]?.unattended).toBe(true)
+  })
+
+  test('a session its run drive steers says it is unattended', DRIVEN, async ($, on) => {
+    const asked = engine(on, 'allow', { decision: 'allow', reason: 'not gated' })
+    on('tool.call', ($, e) => {
+      const text = JSON.stringify({ run: { id: 'run-7', status: 'pending' }, track_url: null })
+      return { result: { content: [{ type: 'text', text }], isError: false } }
+    })
+    await $.tool.call({ tool: 'mcp__plugin_sensei_sensei__start_run', goal: 'ship it' })
+
+    await check($)
+
+    expect(asked.at(-1)?.unattended).toBe(true)
+  })
+
+  test('the daemon denying an unanswered hard-block in one denies the call', GATED, async ($, on) => {
+    const reason = 'force-push rewrites remote history — gate timed out, and no one can answer in an unattended run: denied'
+    engine(on, 'allow', { decision: 'deny', reason }, { SENSEI_RUN_ID: 'run-7' })
+
+    const verdict = await check($)
+
+    expect(verdict.decision).toBe('deny')
+    expect(verdict.reason).toBe(reason)
   })
 })

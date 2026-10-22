@@ -11,7 +11,7 @@ The primary creative command. One conversation can produce artifacts at multiple
 
 1. Call `update_phase(phase="brainstorm")` — MANDATORY
 2. Call `log_event(type="command_invoked", data="{\"command\":\"brainstorm\",\"args\":\"$ARGUMENTS\"}")` — MANDATORY
-3. Read `.sensei/rules.md` if it exists — follow project rules
+3. Read `.sensei/rules.md` if it exists — follow repository rules
 4. If $ARGUMENTS is provided, start the conversation there. If empty, ask: "What's on your mind?"
 5. Engage in open conversation. Ask clarifying questions. Explore options.
 6. As the conversation produces artifacts, route them by depth:

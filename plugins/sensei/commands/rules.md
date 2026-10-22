@@ -1,11 +1,11 @@
 ---
-description: View, create, or add project rules — enforceable patterns, quality, and process constraints
+description: View, create, or add repository rules — enforceable patterns, quality, and process constraints
 argument-hint: Optional rule to add (e.g. "use adapter pattern for parsers")
 ---
 
 ## What this command does
 
-Manages the project's rules file (`.sensei/rules.md`) — enforceable rules about how to build in this project. Rules are different from memory (facts) — they are constraints the AI must follow.
+Manages the repository's rules file (`.sensei/rules.md`) — enforceable rules about how to build in this repository. Rules are different from memory (facts) — they are constraints the AI must follow.
 
 ## Procedure
 
@@ -20,7 +20,7 @@ Manages the project's rules file (`.sensei/rules.md`) — enforceable rules abou
 
 ### If `.sensei/rules.md` does NOT exist:
 
-1. Ask the user: "No rules found for this project. Want me to create one? What patterns or rules should I include?"
+1. Ask the user: "No rules found for this repository. Want me to create one? What patterns or rules should I include?"
 2. Create `.sensei/` directory if needed
 3. Create `.sensei/rules.md` with:
    - Frontmatter: name, updated date
@@ -31,6 +31,6 @@ Manages the project's rules file (`.sensei/rules.md`) — enforceable rules abou
 ## Important
 
 - Mindsets ship with the plugin as subagents (`/sensei:agent`) — they are universal and not edited here
-- DO modify .sensei/rules.md — that's project-specific and meant to grow
+- DO modify .sensei/rules.md — that's repository-specific and meant to grow
 - When adding a rule, always ask at least one clarifying question — don't assume
 - Keep rules concise — one line per rule, actionable, testable

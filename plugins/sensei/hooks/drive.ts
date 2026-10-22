@@ -42,6 +42,12 @@ async function driveKey($: EngineInterface) {
   return `drive:${await $.session.id()}`
 }
 
+// Whether this session's run drive is on: nudges arrive as prompts, nobody need
+// be at the keyboard (the relay gate treats it as unattended, #312).
+export async function isDriven($: EngineInterface) {
+  return (await $.store.get(await driveKey($))) !== undefined
+}
+
 async function poll($: EngineInterface) {
   const key = await driveKey($)
   const drive = (await $.store.get(key)) as Drive | undefined

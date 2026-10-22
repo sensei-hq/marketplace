@@ -21,7 +21,7 @@ Breaks a blueprint into ordered, implementable features. Each feature has accept
 
 1. Call `update_phase(phase="plan")` — MANDATORY
 2. Call `log_event(type="command_invoked", data="{\"command\":\"plan\",\"args\":\"$ARGUMENTS\"}")` — MANDATORY
-3. Read `.sensei/rules.md` if it exists — follow project rules
+3. Read `.sensei/rules.md` if it exists — follow repository rules
 4. Find the relevant blueprint:
    - If $ARGUMENTS names a specific blueprint, look for it in `docs/blueprints/`
    - If empty, list files in `docs/blueprints/` and ask which to plan

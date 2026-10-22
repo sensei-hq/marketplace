@@ -19,7 +19,7 @@ Feasibility assessment. Reads prior idea docs, scans the codebase for related pa
 
 1. Call `update_phase(phase="analyze")` — MANDATORY
 2. Call `log_event(type="command_invoked", data="{\"command\":\"analyze\",\"args\":\"$ARGUMENTS\"}")` — MANDATORY
-3. Read `.sensei/rules.md` if it exists — follow project rules
+3. Read `.sensei/rules.md` if it exists — follow repository rules
 4. Find the relevant idea doc:
    - If $ARGUMENTS names a specific idea, look for it in `docs/ideas/`
    - If empty, list files in `docs/ideas/` and ask which to analyze
@@ -27,7 +27,7 @@ Feasibility assessment. Reads prior idea docs, scans the codebase for related pa
 6. Scan the codebase using MCP tools — MANDATORY:
    - `search()` for related symbols and patterns
    - `get_patterns()` for structural patterns in the codebase
-   - `get_project_summary()` for project context
+   - `get_workspace_summary()` for workspace context
 7. Create a doc in `docs/analysis/` with this structure:
 
 ````markdown

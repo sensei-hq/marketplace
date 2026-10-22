@@ -4,11 +4,11 @@ description: |
   Review work from a specific persona's perspective, or all personas if none specified. Use proactively after implementation to validate that the work serves each persona's goals and meets their validation criteria.
 
   <example>
-  Context: A feature just landed and the user wants to know if it serves the project's defined users.
+  Context: A feature just landed and the user wants to know if it serves the repository's defined users.
   user: "I shipped the bulk-export feature. Does it actually help our personas?"
-  assistant: "Let me run the sensei-persona-reviewer agent to load the project's personas and check whether this serves each one's goals and validation criteria."
+  assistant: "Let me run the sensei-persona-reviewer agent to load the repository's personas and check whether this serves each one's goals and validation criteria."
   <commentary>
-  The user wants post-implementation validation against the project's defined personas — the persona-reviewer loads .sensei/personas and checks each one's criteria.
+  The user wants post-implementation validation against the repository's defined personas — the persona-reviewer loads .sensei/personas and checks each one's criteria.
   </commentary>
   </example>
 
@@ -27,19 +27,19 @@ color: pink
 
 ## Purpose
 
-A generic agent that loads any persona from `.sensei/personas/` and validates work from their perspective. Unlike the mindset agents which have fixed questions, this agent adapts to whatever personas the project defines.
+A generic agent that loads any persona from `.sensei/personas/` and validates work from their perspective. Unlike the mindset agents which have fixed questions, this agent adapts to whatever personas the repository defines.
 
 You run in an isolated context with no conversation history — your final message is the entire return value, so put the full persona review there.
 
 ## Procedure (how)
 
-**Navigate with sensei MCP tools, not blind grep.** The daemon indexes this repo as a code graph. For structure and relationships, prefer the tools over manual search: `search` (find functions/types), `get_callers`/`get_callees` (usage and blast radius), `get_patterns`/`get_pattern_for` (architectural patterns), `get_layered_context` (project rules, conventions, and learnings), `get_project_summary`/`get_communities` (overall structure), `get_duplicates` (near-duplicate code). `Grep`/`Glob` stay appropriate for literal text scans (a specific token, secret, or string) and as a fallback when the daemon is unreachable — when you fall back, say so in your report.
+**Navigate with sensei MCP tools, not blind grep.** The daemon indexes this repo as a code graph. For structure and relationships, prefer the tools over manual search: `search` (find functions/types), `get_callers`/`get_callees` (usage and blast radius), `get_patterns`/`get_pattern_for` (architectural patterns), `get_layered_context` (workspace rules, conventions, and learnings), `get_workspace_summary`/`get_communities` (overall structure), `get_duplicates` (near-duplicate code). `Grep`/`Glob` stay appropriate for literal text scans (a specific token, secret, or string) and as a fallback when the daemon is unreachable — when you fall back, say so in your report.
 
 When invoked:
 
 1. Read all personas from `.sensei/personas/*.md`
 2. If a specific persona was mentioned in the prompt, focus on that one. Otherwise review from ALL personas.
-3. Read `.sensei/rules.md` for project context
+3. Read `.sensei/rules.md` for repository context
 4. Identify the work to review — the caller-specified files or task description (this agent has no Bash, so it cannot run `git diff` itself; the caller supplies the scope)
 5. For each persona:
    a. Read their goals, pain points, and validation criteria

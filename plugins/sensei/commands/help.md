@@ -31,7 +31,7 @@ Typical flow: `idea → analyze → blueprint → plan → build → validate`
 |---------|-------------|
 | `/sensei:brainstorm` | Open creative conversation — explore ideas without committing to a direction |
 | `/sensei:review` | Quality check — pattern conformance, duplicates, test coverage, doc drift, persona validation |
-| `/sensei:persona` | Manage project personas — role-play users to validate design decisions |
+| `/sensei:persona` | Manage repository personas — role-play users to validate design decisions |
 | `/sensei:agent` | List available agents or invoke one by name |
 
 ### `/sensei:persona` sub-actions
@@ -56,8 +56,8 @@ Typical flow: `idea → analyze → blueprint → plan → build → validate`
 |---------|-------------|
 | `/sensei:session` | Resume session — loads context, open decisions, and interrupted work |
 | `/sensei:spec` | Reverse-engineer docs — product overview, feature deep-dive, or security audit |
-| `/sensei:rules` | View, create, or add project rules — enforceable constraints loaded every session |
-| `/sensei:patterns` | Show detected patterns, project conventions, and match patterns for a task |
+| `/sensei:rules` | View, create, or add repository rules — enforceable constraints loaded every session |
+| `/sensei:patterns` | Show detected patterns, workspace conventions, and match patterns for a task |
 | `/sensei:checkpoint` | Snapshot current progress for interruption recovery |
 | `/sensei:commit` | Run zero-errors checks then commit |
 | `/sensei:mockup` | Start a UI mockup — framework-native build at real app routes (commits dirty work first) |
@@ -94,7 +94,7 @@ Invoke with `/sensei:agent use <name> [task description]`. Agents run autonomous
 | `sensei-performance-engineer` | Complexity, memory, network costs, scalability limits | When a task involves data processing, queries, loops, or user-facing latency |
 | `sensei-ux-designer` | Usability, accessibility, consistency of user-facing surfaces | When a task involves commands, UI components, output formatting, or user-facing messages |
 | `sensei-devops-sre` | Deployability, monitoring, rollback safety, failure modes | When a task involves deployment, infrastructure, configuration, or reliability-sensitive changes |
-| `sensei-persona-reviewer` | Persona validation — review work from each defined project persona's perspective | After implementation to verify the work serves each persona's goals and criteria |
+| `sensei-persona-reviewer` | Persona validation — review work from each defined persona's perspective | After implementation to verify the work serves each persona's goals and criteria |
 | `sensei-test-reviewer` | Test-intent audit — tests vs the functional need, with a mutation spot-check | After implementation/TDD to catch assertions on fallbacks/mocks and acceptance criteria with no failing test |
 | `sensei-plan-depth-reviewer` | Pre-run plan depth gate — observable criteria, no TBDs, pre-answered ambiguities | Before a daemon-owned autonomous run — confirm each feature is deep enough to build without asking |
 

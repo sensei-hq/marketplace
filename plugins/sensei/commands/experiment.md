@@ -11,7 +11,7 @@ Test an assumption by building a minimal prototype. Code is structured for poten
 
 1. Call `update_phase(phase="experiment")` — MANDATORY
 2. Call `log_event(type="command_invoked", data="{\"command\":\"experiment\",\"args\":\"$ARGUMENTS\"}")` — MANDATORY
-3. Read `.sensei/rules.md` if it exists — follow project rules
+3. Read `.sensei/rules.md` if it exists — follow repository rules
 4. If $ARGUMENTS is empty, ask: "What assumption do you want to test?"
 5. Create a git branch for the experiment: `git checkout -b experiment/<name>`
 6. Build the minimal prototype — just enough to test the hypothesis

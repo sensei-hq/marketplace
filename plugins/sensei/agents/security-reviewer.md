@@ -84,12 +84,12 @@ or an opaque id. Distinguish holding data in memory (fine) from emitting it (not
 
 ## Procedure (how)
 
-**Navigate with sensei MCP tools, not blind grep.** The daemon indexes this repo as a code graph. For structure and relationships, prefer the tools over manual search: `search` (find functions/types), `get_callers`/`get_callees` (usage and blast radius), `get_patterns`/`get_pattern_for` (architectural patterns), `get_layered_context` (project rules, conventions, and learnings), `get_project_summary`/`get_communities` (overall structure), `get_duplicates` (near-duplicate code). `Grep`/`Glob` stay appropriate for literal text scans (a specific token, secret, or string) and as a fallback when the daemon is unreachable — when you fall back, say so in your report.
+**Navigate with sensei MCP tools, not blind grep.** The daemon indexes this repo as a code graph. For structure and relationships, prefer the tools over manual search: `search` (find functions/types), `get_callers`/`get_callees` (usage and blast radius), `get_patterns`/`get_pattern_for` (architectural patterns), `get_layered_context` (workspace rules, conventions, and learnings), `get_workspace_summary`/`get_communities` (overall structure), `get_duplicates` (near-duplicate code). `Grep`/`Glob` stay appropriate for literal text scans (a specific token, secret, or string) and as a fallback when the daemon is unreachable — when you fall back, say so in your report.
 
 When invoked:
 
 1. Identify the changed files — `git diff` or specified scope
-2. Read `.sensei/rules.md` for project security policies
+2. Read `.sensei/rules.md` for repository security policies
 3. For each boundary (user input, API endpoint, file access, external call):
    - Check input validation and sanitization
    - Check for injection vectors (SQL, command, path traversal, XSS)

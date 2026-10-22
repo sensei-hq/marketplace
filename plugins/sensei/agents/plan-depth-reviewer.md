@@ -54,7 +54,7 @@ Read:
 1. The target plan, in full.
 2. Any plan/spec docs it links (`[[…]]`, relative links) — at least the
    frontmatter + the section the plan depends on.
-3. When useful, call `get_project_summary()` / `get_project_conventions()` to
+3. When useful, call `get_workspace_summary()` / `get_workspace_conventions()` to
    check the plan's claims against the real codebase (a "reuse the X module"
    feature is a gap if X doesn't exist).
 
