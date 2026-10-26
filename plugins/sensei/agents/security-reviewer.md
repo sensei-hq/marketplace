@@ -50,7 +50,9 @@ covered?"** For any value that is or contains a credential, walk this list expli
   value to the error is exactly what makes debugging easier
 - panic messages, assertion messages, and `Debug` output — a careful `Display` impl next to a
   derived `Debug` that the error path prints as `{:?}` is a live leak. Check both.
-- `--help` / usage text, and any framework that echoes an env-bound argument's resolved value
+- `--help` / usage text, and any framework that echoes an env-bound argument's resolved value —
+  and the documentation: guidance must point at an indirection (a variable name), never show a
+  literal secret
 - structured logs, traces, telemetry
 - **files the program writes** — generated config, snapshots, exports, migrations, caches,
   lockfiles, diagnostics bundles — and the permissions they carry. A world-readable cache holding a
@@ -69,12 +71,20 @@ passwords, percent-encoded credentials, a token in a query parameter, and an alr
 - **SQL identifiers**, not just literals. Generated DDL/DML that interpolates a name instead of
   quoting it. Ask what a name containing a quote, semicolon, comment marker, or newline produces.
   *"The names come from our own files" is not a trust boundary* — those files are user-authored and
-  can arrive from a clone or a template.
+  can arrive from a clone or a template. Environment variables are attacker-controlled in some
+  deployment shapes too: treat them as input, not only as where secrets live.
 - **Shell and subprocess.** Arguments must be passed as a vector, not assembled into a string.
 - Regex, format strings, and templating built from input.
 - **Path traversal** on any path derived from data (archive entries, config-supplied names). A `..`
   check alone is incomplete — also consider absolute paths, symlinks escaping the root, and
   platform separators. Where a guard exists, test its completeness rather than accepting it.
+
+### Untrusted size and shape
+
+Parsing untrusted structured input with no depth or size bound; extracting an archive with no
+limit on entry count or expanded size; an index, count or length read from the input that sizes
+an allocation (a two-line file asking for element 4,000,000,000 is an out-of-memory kill — #123
+A1). Ask what the largest value the input can name makes the program do.
 
 ### Third-party and user data
 
@@ -110,7 +120,8 @@ When invoked:
    - Map what this component has access to
    - Check privilege level (minimum necessary?)
    - Identify failure domain boundaries
-6. Cross-reference against OWASP Top 10
+6. Name each finding's OWASP category. Never add generic hardening advice that no finding in this
+   change supports, and never pad a non-finding into a LOW so there is something to say.
 
 ## Verification evidence (required — no assume-green)
 
@@ -132,7 +143,42 @@ domain owns and paste the ACTUAL output as evidence — never "looks correct":
 If you cannot produce the evidence (no test exists, the command fails, the daemon is down),
 say so explicitly and lower your confidence — never pass unverified work as green.
 
+## Output contract
+
+**When the caller asks for `NO FINDINGS` on an empty result** (the `/sensei:review` swarm does),
+that contract wins over the report below: output exactly `NO FINDINGS` and nothing else, or only
+the findings, most severe first, each in this shape:
+
+```
+[SEVERITY] <one-line claim, <= 60 chars>
+  file:     <path>:<line>
+  class:    <kebab-case slug: redaction-gap, sql-identifier-injection, argument-injection,
+             path-traversal, secret-at-rest, unbounded-input>
+  what:     <one sentence stating the defect>
+  sink:     <the exact sink the value reaches — which stream, which file, which message>
+  failure:  <concrete input/state -> what an observer sees or an attacker achieves, and who>
+  evidence: <the sentinel run and its output, or the exact lines you read>
+  fix:      <the smallest correct change>
+  red-test: <the assertion that fails before the fix and passes after — for a leak, a test
+             asserting the sentinel does NOT appear in that sink>
+```
+
+The `evidence` and `red-test` fields are what the review merges duplicate findings on.
+
+### Severity ladder
+
+- **CRITICAL** — a credential reaching a durable or shared sink (a written file, a committed
+  artifact, a log store, process arguments); or input reaching an interpreter with a
+  demonstrable escape.
+- **HIGH** — a credential reaching a transient sink an operator or CI log captures (stderr, an
+  error message, help text); or path traversal with an incomplete guard.
+- **MEDIUM** — a redaction that covers the common shape but provably misses a reachable one; a
+  missing resource bound on untrusted input.
+- **LOW** — defense in depth that is absent but not reachable in this codebase, stated once.
+
 ## Report Format
+
+Otherwise (a standalone review), report in full:
 
 ```
 ## Security Review: [task name]

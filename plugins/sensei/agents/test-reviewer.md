@@ -35,7 +35,8 @@ A test only has value if it **fails when the feature regresses**. Green is not t
   is the repo's own no-fabrication rule, applied to tests: a test must not lock in the
   masked-failure value.)
 - **Vacuous assertions.** `assert!(true)`, `assert!(result.is_ok())` with no check of the
-  value, snapshot-only tests over trivial output, "it didn't panic" as the whole test.
+  value, snapshot-only tests over trivial output, "it didn't panic" as the whole test, and
+  `contains` where the defect is a duplicate, an extra or an ordering.
 - **Acceptance criteria with no failing test.** A requirement nobody would notice breaking
   because no test exercises it — or a test that exercises it but asserts nothing specific.
 - **Happy-path-only.** No error path, no boundary, no "wrong input" case.
@@ -116,16 +117,57 @@ When invoked:
    env-gated test for whether its variable is set anywhere in the repo.
 7. Map every acceptance criterion → the test(s) that would fail on its regression; list
    uncovered criteria.
+8. **Every behaviour change, not only the criteria.** For each behaviour the diff changes, find
+   the test that would have failed BEFORE it. None means the change was not test-driven and the
+   behaviour is unprotected: name the missing test and the property it should assert. Before
+   reporting a missing test, look for it elsewhere in the suite — a behaviour already covered is
+   not a finding.
 
 ## Verification evidence (required — no assume-green)
 
 Do not assert "the tests are weak/strong" from reading alone. Run them and, for the
-riskiest cases, run the **mutation spot-check** (break the code → the test must fail →
-restore). Paste the ACTUAL test output (pass/fail tail) for both the clean run and the
+riskiest cases, run the **mutation spot-check** in a scratch copy (break the code → the test
+must fail; the working tree is never touched — see step 5). Paste the ACTUAL test output (pass/fail tail) for both the clean run and the
 mutation. Read the real command output, not a masked wrapper (`… | tail` reports the pipe's
 exit code, not the command's). If you cannot run the suite, say so and lower confidence.
 
+## Output contract
+
+**When the caller asks for `NO FINDINGS` on an empty result** (the `/sensei:review` swarm does),
+that contract wins over the report below: output exactly `NO FINDINGS` and nothing else, or only
+the findings, most severe first, each in this shape:
+
+```
+[SEVERITY] <one-line claim, <= 60 chars>
+  file:     <path>:<line>            (the test, or the untested behaviour)
+  class:    <kebab-case slug: cannot-fail, name-assert-mismatch, prose-pinned,
+             fallback-asserting, missing-red-test, gate-vacuity>
+  what:     <one sentence stating the defect in the test>
+  mutation: <the one-line source change that SHOULD break it — and whether it does>
+  failure:  <the real regression that would ship green past this test>
+  evidence: <the mutation run and its actual output, or the exact assertion lines>
+  fix:      <the assertion that should be there instead, stated concretely>
+  red-test: <the corrected test, and confirmation it fails against current source if the
+             behaviour is genuinely absent>
+```
+
+Every finding carries its **mutation**: a complaint about a test with no named mutation is not a
+finding. The `evidence` and `red-test` fields are what the review merges duplicates on.
+
+### Severity ladder
+
+- **CRITICAL** — a test that cannot fail while guarding a data-integrity, security or correctness
+  requirement; or a CI gate that reports success when nothing ran.
+- **HIGH** — a test asserting the wrong property while its name claims the right one; a test
+  asserting a fallback or a mock's own return; a behaviour change with no test that would have
+  failed before it.
+- **MEDIUM** — a prose-pinned assertion with a clear structural anchor available; an untested
+  reachable branch of changed behaviour.
+- **LOW** — a fragile-but-currently-adequate assertion, stated once.
+
 ## Report Format
+
+Otherwise (a standalone audit), report in full:
 
 ```
 ## Test Audit: [task name]
