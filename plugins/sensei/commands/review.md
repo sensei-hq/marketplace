@@ -64,7 +64,7 @@ The gate that decides *how hard* to review, so rigor lands on the changes that m
 
 ### Check 2: Duplication (+ dry-check)
 
-1. Call `get_duplicates()` — returns functions with identical signatures in different files + same-name functions across files
+1. Call `get_duplicates()` — returns the code qlty found duplicated, as groups of identical or similar copies (file + lines), largest first
 2. Flag any duplicates involving modified files
 3. For each NET-NEW function/type, confirm a `dry-check` was done — the author searched (`search`/`get_duplicates`/`get_callers`) for an existing implementation before writing it. An unsearched net-new function that overlaps existing code is a finding.
 4. Log findings — MANDATORY

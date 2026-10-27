@@ -149,7 +149,7 @@ You MUST use sensei MCP tools instead of grep/glob for code navigation — they 
 **Find code (use instead of grep/glob — populated and reliable):**
 - \`search(query, workspace?)\` — find functions/types by name or concept (replaces grep for symbol search).
 - \`get_callers(name)\` / \`get_callees(name)\` — caller/callee tracing over the indexed call graph.
-- \`get_duplicates(min_similarity?)\` — near-duplicate functions; reuse before adding.
+- \`get_duplicates(limit?)\` — code qlty found duplicated, as groups of copies; reuse before adding.
 - \`get_communities()\` — code architecture clusters.
 
 **Library Documentation:**
