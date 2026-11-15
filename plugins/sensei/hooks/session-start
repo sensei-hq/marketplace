@@ -135,6 +135,18 @@ ${RULES_SECTION}
 ${MINDSETS_SECTION}
 
 ${PERSONAS_SECTION}
+## Relay (crew lanes — register once per lane)
+
+Coordinate multi-lane work through the relay. Each lane registers with its
+MCP tool (no lane_token needed to register — one is minted for you):
+- Coordinator (first lane): 'relay_register(role=\"coordinator\")' with no
+  crew_id mints the crew; the response crew_id goes in the contributor line.
+- Contributor: 'relay_register(family=\"<family>\")' joins the one active crew
+  (add crew_id=\"<id>\" when several are open; role defaults to contributor).
+Then work is claimed, never handed out: 'relay_claim_next' takes the next
+review or task, 'relay_report_task' floats your report for a peer, and the
+broker's gate merges what a peer approves. Reading never starts a task.
+Run 'sensei relay' for a one-line registration status (registered crew/lane or not-registered).
 
 ## Sensei MCP Tools (REQUIRED)
 

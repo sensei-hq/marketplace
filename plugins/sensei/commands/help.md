@@ -59,6 +59,7 @@ Typical flow: `idea → analyze → blueprint → plan → build → validate`
 | `/sensei:rules` | View, create, or add repository rules — enforceable constraints loaded every session |
 | `/sensei:patterns` | Show detected patterns, workspace conventions, and match patterns for a task |
 | `/sensei:checkpoint` | Snapshot current progress for interruption recovery |
+| `/sensei:register` | Join a relay crew in one step — register, print the lane loop, start the 60s heartbeat |
 | `/sensei:commit` | Run zero-errors checks then commit |
 | `/sensei:mockup` | Start a UI mockup — framework-native build at real app routes (commits dirty work first) |
 | `/sensei:docs` | Fetch library documentation before writing code that uses it |

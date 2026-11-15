@@ -148,6 +148,18 @@ else
 fi
 rm -f "$fallback" "$TEMP_REPO/.sensei/rules.md"
 
+# ── session-start: relay onboarding lines (slice 1 item 5) ──────────────────
+# Pins the two paste lines (relay_register with no crew_id mints the crew
+# for a coordinator, with the crew_id joins it for a contributor) plus a
+# `sensei relay` CLI hint.
+output=$(run_hook "session-start" "$SESSION_PAYLOAD")
+assert_json "onboarding: coordinator paste line mints the crew" "$output" \
+  "import sys,json; c=json.load(sys.stdin)['additional_context']; assert 'relay_register(role=\"coordinator\")' in c and 'mints the crew' in c"
+assert_json "onboarding: contributor paste line joins with the crew_id" "$output" \
+  "import sys,json; c=json.load(sys.stdin)['additional_context']; assert 'relay_register(family=' in c and 'crew_id' in c and 'relay_claim_next' in c"
+assert_json "onboarding: sensei relay CLI hint" "$output" \
+  "import sys,json; c=json.load(sys.stdin)['additional_context']; assert 'sensei relay' in c"
+
 # ── pre-compact: telemetry + context injection ───────────────────────────────
 
 echo ""

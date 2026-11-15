@@ -1,5 +1,5 @@
 {
-  "version": "0.21.1",
+  "version": "0.22.0",
   "items": [
     {
       "name": "verify-outcome",
@@ -362,6 +362,15 @@
       "recommended_for": ["all"],
       "stage": ["active"],
       "path": "commands/help.md"
+    },
+    {
+      "name": "register",
+      "kind": "command",
+      "description": "Join a relay crew in one step — register, print the lane loop, and start the 60s heartbeat.",
+      "scope": "project",
+      "recommended_for": ["all"],
+      "stage": ["active"],
+      "path": "commands/register.md"
     },
     {
       "name": "sensei-analyst",
