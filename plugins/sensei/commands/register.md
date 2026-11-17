@@ -15,6 +15,8 @@ Joins a relay crew with one call and hands back the loop you must run — no out
    - `crew_id` — leave it out. A contributor joins the machine's open crew; a coordinator mints one. Pass it only to join a *named* crew.
    - `suggested_name` — the lane title you propose for yourself.
    - `model`, `version`, `repo`, `worktree` when they are known — they ride along.
+   - `host` — the editor you run inside (`cursor`, `zed`), when you run in one; omit it in a terminal.
+     The person sees it on your card; your transcripts count for your model, not the editor.
 
    Without MCP, `POST /api/relay/register` with the same body.
 
