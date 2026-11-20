@@ -131,3 +131,34 @@ describe('unattended runs (#312, D28)', () => {
     expect(verdict.reason).toBe(reason)
   })
 })
+
+describe('the gate names the run (#312)', () => {
+  test('a step the daemon spawned sends SENSEI_RUN_ID as run_id', GATED, async ($, on) => {
+    const asked = engine(on, 'allow', { decision: 'allow', reason: 'not gated' }, { SENSEI_RUN_ID: 'run-7' })
+
+    await check($)
+
+    expect(asked[0]?.run_id).toBe('run-7')
+  })
+
+  test('a driven session sends the run drive\'s run id', DRIVEN, async ($, on) => {
+    const asked = engine(on, 'allow', { decision: 'allow', reason: 'not gated' })
+    on('tool.call', () => {
+      const text = JSON.stringify({ run: { id: 'run-9', status: 'pending' }, track_url: null })
+      return { result: { content: [{ type: 'text', text }], isError: false } }
+    })
+    await $.tool.call({ tool: 'mcp__plugin_sensei_sensei__start_run', goal: 'ship it' })
+
+    await check($)
+
+    expect(asked.at(-1)?.run_id).toBe('run-9')
+  })
+
+  test('an interactive session sends no run_id', GATED, async ($, on) => {
+    const asked = engine(on, 'allow', { decision: 'allow', reason: 'not gated' })
+
+    await check($)
+
+    expect(asked[0]).not.toHaveProperty('run_id')
+  })
+})

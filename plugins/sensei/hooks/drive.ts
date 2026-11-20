@@ -42,10 +42,11 @@ async function driveKey($: EngineInterface) {
   return `drive:${await $.session.id()}`
 }
 
-// Whether this session's run drive is on: nudges arrive as prompts, nobody need
-// be at the keyboard (the relay gate treats it as unattended, #312).
-export async function isDriven($: EngineInterface) {
-  return (await $.store.get(await driveKey($))) !== undefined
+// The run this session's drive steers, or undefined when the drive is off. A
+// driven session gets nudges as prompts, so nobody need be at the keyboard: the
+// relay gate treats it as unattended and names this run (#312).
+export async function drivenRunId($: EngineInterface) {
+  return ((await $.store.get(await driveKey($))) as Drive | undefined)?.runId
 }
 
 async function poll($: EngineInterface) {

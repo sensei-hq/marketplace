@@ -9,10 +9,12 @@
 //
 // It tells the daemon when the session is UNATTENDED — a step the daemon spawned
 // (SENSEI_RUN_ID) or a session its run drive steers — so an unanswered
-// hard-block there is denied rather than let through (#312, D28).
+// hard-block there is denied rather than let through (#312, D28). It also names
+// that run (`run_id`), so the daemon records each gate's outcome in the run's
+// activity. An interactive session sends no run id.
 import type { On, PluginOptions } from 'claude-code'
 import { request } from './daemon.ts'
-import { isDriven } from './drive.ts'
+import { drivenRunId } from './drive.ts'
 
 type GateAnswer = { hookSpecificOutput?: { permissionDecision?: string; permissionDecisionReason?: string } }
 
@@ -22,6 +24,7 @@ export const registerGate = (on: On, options: PluginOptions) => {
     const verdict = await next(e)
     // A query runs nothing, and a call the engine refuses needs no human.
     if (e.tool_use_id === undefined || verdict.decision === 'deny') return verdict
+    const runId = (await $.env.get('SENSEI_RUN_ID')) ?? (await drivenRunId($))
     const body = JSON.stringify({
       session_id: await $.session.id(),
       hook_event_name: 'PreToolUse',
@@ -29,7 +32,8 @@ export const registerGate = (on: On, options: PluginOptions) => {
       tool_input: e.input,
       tool_use_id: e.tool_use_id,
       cwd: await $.session.root(),
-      unattended: (await $.env.get('SENSEI_RUN_ID')) !== undefined || (await isDriven($)),
+      unattended: runId !== undefined,
+      run_id: runId,
     })
     const answer = await request($, '/hook/gate', body, undefined)
     const said = answer === undefined ? undefined : (JSON.parse(answer) as GateAnswer).hookSpecificOutput
